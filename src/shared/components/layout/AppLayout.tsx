@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, User, LogOut, ShieldCheck } from 'lucide-react';
+import { Home, User, LogOut, ShieldCheck, Search, ShoppingCart, Bell } from 'lucide-react';
 import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
 import { cn } from '@/shared/lib/utils';
 import type { CurrentUser } from '@/modules/auth/types/auth.types';
-
-const navItems = [
-  { to: '/', label: 'Home', icon: Home },
-  { to: '/profile', label: 'Profile', icon: User },
-];
 
 export const AppLayout = () => {
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -36,52 +32,82 @@ export const AppLayout = () => {
   const initials = user?.email?.slice(0, 2).toUpperCase() ?? '??';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background">
       <header className="sticky top-0 z-50 border-b border-border bg-card">
-        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 text-sm font-semibold">
-            <div className="flex size-7 items-center justify-center rounded-lg bg-primary/20 text-primary">
-              <ShieldCheck className="size-4" />
-            </div>
-            <span className="hidden sm:inline">MERN Auth</span>
+          <Link to="/" className="flex items-center gap-2">
+            <h1 className="text-[#C83B1E] font-bold text-xl leading-none">
+              The Editorial<br /><span className="text-sm font-light">Marketplace</span>
+            </h1>
+          </Link>
+
+          {/* Search Bar */}
+          <div className="hidden md:block flex-1 max-w-md relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <Input className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Search curated collections..." />
+          </div>
+
+          {/* Home Link */}
+          <Link
+            to="/"
+            className={cn(
+              'hidden sm:inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors',
+              location.pathname === '/'
+                ? 'bg-primary/15 text-primary'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            <Home className="size-4" />
+            <span className="hidden lg:inline">Home</span>
           </Link>
 
           {/* Nav links */}
-          <nav className="flex items-center gap-1">
-            {navItems.map((item) => (
+          <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-muted-foreground">
+            <a href="#" className="text-[#C83B1E]">Flash Sales</a>
+            <a href="#" className="hover:text-foreground">Categories</a>
+            <a href="#" className="hover:text-foreground">Brands</a>
+            <a href="#" className="hover:text-foreground">Vouchers</a>
+          </nav>
+
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Shopping & Notifications */}
+            <div className="flex items-center gap-3 mr-2">
+              <div className="relative cursor-pointer text-muted-foreground hover:text-foreground">
+                <ShoppingCart className="size-5" />
+                <span className="absolute -top-2 -right-2 bg-[#C83B1E] text-white text-[10px] rounded-full size-4 flex items-center justify-center">2</span>
+              </div>
+              <Bell className="size-5 cursor-pointer text-muted-foreground hover:text-foreground" />
+            </div>
+
+            {/* User actions */}
+            <div className="flex items-center gap-1 sm:gap-2 pl-2 border-l border-border">
+              <ThemeToggle />
               <Link
-                key={item.to}
-                to={item.to}
+                to="/profile"
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors',
-                  location.pathname === item.to
+                  'inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm transition-colors',
+                  location.pathname === '/profile'
                     ? 'bg-primary/15 text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
-                <item.icon className="size-4" />
-                <span className="hidden sm:inline">{item.label}</span>
+                <User className="size-4" />
+                <span className="hidden sm:inline">Profile</span>
               </Link>
-            ))}
-          </nav>
-
-          {/* User + logout */}
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Avatar className="size-8">
-              <AvatarImage src={user?.avatarUrl} alt={user?.email} />
-              <AvatarFallback className="text-xs">{initials}</AvatarFallback>
-            </Avatar>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground hover:text-foreground">
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+              <Avatar className="size-8">
+                <AvatarImage src={user?.avatarUrl} alt={user?.email} />
+                <AvatarFallback className="text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground hover:text-foreground px-2">
+                <LogOut className="size-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-7xl px-4 py-6 w-full flex-1">
         <Outlet />
       </main>
     </div>

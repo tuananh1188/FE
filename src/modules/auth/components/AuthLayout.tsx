@@ -1,54 +1,104 @@
-import { ShieldCheck } from 'lucide-react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { cn } from '@/shared/lib/utils';
-import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
-
-const navItems = [
-  { to: '/login', label: 'Login' },
-  { to: '/register', label: 'Register' },
-  { to: '/forgot-password', label: 'Forgot Password' }
-];
+import { Link, Outlet, useLocation } from "react-router-dom";
+import { cn } from "@/shared/lib/utils";
+import { ThemeToggle } from "@/shared/components/ui/theme-toggle";
 
 export const AuthLayout = () => {
   const location = useLocation();
 
   return (
-    <main className="relative mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center p-4 md:p-8">
-      <div className="absolute right-4 top-4">
+    <div className="min-h-screen bg-[#F9F9F9] font-sans antialiased flex flex-col">
+      {/* Nút chuyển chế độ tối/sáng (Tùy chọn) */}
+      <div className="fixed right-6 top-6 z-50">
         <ThemeToggle />
       </div>
-      <section className="grid w-full gap-6 md:grid-cols-2">
-        <div className="hidden rounded-2xl border bg-card p-8 md:flex md:flex-col md:justify-between">
-          <div>
-            <div className="mb-5 inline-flex size-11 items-center justify-center rounded-xl bg-primary/20 text-primary">
-              <ShieldCheck className="size-6" />
-            </div>
-            <h1 className="text-3xl font-bold">MERN Auth Starter</h1>
-            <p className="mt-3 text-sm text-muted-foreground">
-              Secure authentication base with OTP verification and clean architecture.
-            </p>
-          </div>
-          <p className="text-xs text-muted-foreground">TypeScript • React • shadcn/ui • TailwindCSS</p>
-        </div>
 
-        <div className="space-y-4">
-          <nav className="inline-flex rounded-lg border bg-muted/40 p-1">
-            {navItems.map((item) => (
+      <main className="flex-grow flex items-center justify-center p-4 md:p-12">
+        <div className="w-full max-w-[1000px] overflow-hidden rounded-[24px] bg-white shadow-2xl flex flex-col md:flex-row min-h-[650px]">
+          {/* CỘT TRÁI: Hình ảnh và Nội dung thương hiệu */}
+          <section className="relative w-full md:w-1/2 p-12 flex flex-col justify-between text-white overflow-hidden bg-black">
+            {/* Background Image với lớp phủ tối */}
+            <div className="absolute inset-0 z-0">
+              <img
+                src="https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=2070&auto=format&fit=crop"
+                alt="Background"
+                className="w-full h-full object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80" />
+            </div>
+
+            <div className="relative z-10">
+              <span className="text-sm font-semibold tracking-tight uppercase">
+                The Editorial Marketplace
+              </span>
+            </div>
+
+            <div className="relative z-10 space-y-4">
+              <h1 className="text-4xl md:text-5xl font-medium leading-tight">
+                Curating the world's finest for your everyday.
+              </h1>
+              <p className="text-lg opacity-80 font-light max-w-sm">
+                Join a community of connoisseurs and discover objects that tell
+                a story.
+              </p>
+            </div>
+          </section>
+
+          {/* CỘT PHẢI: Form (Outlet sẽ render Register/Login ở đây) */}
+          <section className="w-full md:w-1/2 bg-white p-8 md:p-16 flex flex-col justify-center">
+            {/* Thanh điều hướng tab (Optional - xóa nếu muốn giống 100% ảnh) */}
+            <nav className="mb-8 flex space-x-6 border-b border-gray-100 pb-2">
               <Link
-                key={item.to}
-                to={item.to}
+                to="/register"
                 className={cn(
-                  'rounded-md px-3 py-1.5 text-sm text-muted-foreground transition',
-                  location.pathname === item.to && 'bg-background text-foreground shadow-sm'
+                  "text-sm font-medium transition-colors relative pb-2",
+                  location.pathname === "/register"
+                    ? "text-black after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-orange-600"
+                    : "text-gray-400 hover:text-gray-600",
                 )}
               >
-                {item.label}
+                Create Account
               </Link>
-            ))}
-          </nav>
-          <Outlet />
+              <Link
+                to="/login"
+                className={cn(
+                  "text-sm font-medium transition-colors",
+                  location.pathname === "/login"
+                    ? "text-black"
+                    : "text-gray-400 hover:text-gray-600",
+                )}
+              >
+                Sign In
+              </Link>
+            </nav>
+
+            <div className="w-full">
+              <Outlet />
+            </div>
+          </section>
         </div>
-      </section>
-    </main>
+      </main>
+
+      {/* FOOTER */}
+      <footer className="w-full max-w-6xl mx-auto px-8 py-10 flex flex-col md:flex-row justify-between items-center border-t border-gray-200 text-[13px] text-gray-500">
+        <div className="space-y-1 text-center md:text-left mb-4 md:mb-0">
+          <p className="font-semibold text-black">The Editorial Marketplace</p>
+          <p>© 2024 The Editorial Marketplace. All rights reserved.</p>
+        </div>
+        <div className="flex gap-6">
+          <Link to="#" className="hover:text-black transition">
+            Privacy Policy
+          </Link>
+          <Link to="#" className="hover:text-black transition">
+            Terms of Service
+          </Link>
+          <Link to="#" className="hover:text-black transition">
+            Help Center
+          </Link>
+          <Link to="#" className="hover:text-black transition">
+            Contact Us
+          </Link>
+        </div>
+      </footer>
+    </div>
   );
 };
