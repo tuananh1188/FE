@@ -41,7 +41,7 @@ export function ProductCard({ name, imageUrl, price, originalPrice, discount, so
                 </div>}
                 {soldPercentage && soldPercentage > 0 && <p className="text-[10px] text-gray-500 mt-1 font-medium uppercase h-2">{soldPercentage}% sold</p>}
                 {showBuyButton && (
-                    <Button className="w-full mt-3 bg-[#C83B1E] hover:bg-[#C83B1E]/90 text-white h-8 text-xs font-semibold">
+                    <Button className="w-full mt-3 bg-[#C83B1E] hover:bg-[#C83B1E]/90 hover:cursor-pointer text-white h-8 text-xs font-semibold">
                         Buy Now
                     </Button>
                 )}

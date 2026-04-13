@@ -6,7 +6,7 @@ import { HomeFooter } from '../components/HomeFooter';
 
 export const HomePage = () => {
   return (
-    <div className="bg-[#F9F9F9] text-[#1A1A1A] font-sans">
+    <div className=" text-[#1A1A1A] font-sans">
       <div className="space-y-12">
         <HeroSection />
         <CategorySection />

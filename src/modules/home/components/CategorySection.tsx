@@ -1,4 +1,9 @@
 import { ChevronRight } from 'lucide-react';
+import { MdOutlineLaptopChromebook } from "react-icons/md";
+import { IoShirtOutline } from "react-icons/io5";
+import { IoHomeOutline } from "react-icons/io5";
+import { GiLipstick } from "react-icons/gi";
+
 
 export const CategorySection = () => {
   return (
@@ -9,10 +14,10 @@ export const CategorySection = () => {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {[
-          { name: 'Electronics', count: '2.4k Items', icon: '📱', bg: 'bg-white' },
-          { name: 'Fashion', count: '5.1k Items', icon: '👕', bg: 'bg-white' },
-          { name: 'Home', count: '1.8k Items', icon: '🏠', bg: 'bg-white' },
-          { name: 'Beauty', count: '3.2k Items', icon: '💄', bg: 'bg-white' },
+          { name: 'Electronics', count: '2.4k Items', icon: <MdOutlineLaptopChromebook style={{ color: '#C83B1E' }} />, bg: 'bg-white' },
+          { name: 'Fashion', count: '5.1k Items', icon: <IoShirtOutline style={{ color: '#C83B1E' }} />, bg: 'bg-white' },
+          { name: 'Home', count: '1.8k Items', icon: <IoHomeOutline style={{ color: '#C83B1E' }} />, bg: 'bg-white' },
+          { name: 'Beauty', count: '3.2k Items', icon: <GiLipstick style={{ color: '#C83B1E' }} />, bg: 'bg-white' },
         ].map((cat) => (
           <div key={cat.name} className={`${cat.bg} rounded-xl p-8 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition cursor-pointer`}>
             <div className="size-12 rounded-full bg-red-50 flex items-center justify-center text-2xl mb-4">{cat.icon}</div>
