@@ -1,5 +1,6 @@
 import { Zap } from 'lucide-react';
-import { Card, CardContent } from '@/shared/components/ui/card';
+import { ProductCard } from './ProductCard';
+import { dataProducts } from './data';
 
 export const FlashSaleSection = () => {
   return (
@@ -14,25 +15,9 @@ export const FlashSaleSection = () => {
           <span className="bg-black px-1.5 py-0.5 rounded text-sm">55</span>
         </div>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Card key={i} className="border-none shadow-sm overflow-hidden group cursor-pointer">
-            <div className="relative aspect-square bg-gray-100">
-              <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-50%</span>
-              <img src={`https://images.unsplash.com/photo-${1500000000000 + i}?q=80&w=500`} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-            </div>
-            <CardContent className="p-3">
-              <h4 className="text-[13px] font-medium truncate">Premium Product {i + 1}</h4>
-              <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-[#C83B1E] font-bold text-sm">$89.00</span>
-                <span className="text-gray-400 text-[11px] line-through">$178.00</span>
-              </div>
-              <div className="mt-3 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-[#C83B1E] h-full w-3/4" />
-              </div>
-              <p className="text-[10px] text-gray-400 mt-1 font-medium">75% SOLD</p>
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4">
+        {dataProducts.slice(0, 5).map((item, index) => (
+          <ProductCard key={index} name={item.name} imageUrl={item.imageUrl} price={item.price} originalPrice={item.originalPrice} discount={item.discount} soldPercentage={item.soldPercentage} />
         ))}
       </div>
     </section>

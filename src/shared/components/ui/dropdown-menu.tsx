@@ -61,7 +61,7 @@ function DropdownMenuContent({ children, className, align = 'start', ...props }:
     <div
       ref={ref}
       className={cn(
-        'absolute z-50 mt-1 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95',
+        'absolute z-50 mt-1 min-w-32 overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95',
         align === 'end' ? 'right-0' : 'left-0',
         className
       )}
