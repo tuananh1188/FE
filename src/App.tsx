@@ -8,6 +8,8 @@ import { ForgotPasswordPage } from '@/modules/auth/pages/ForgotPasswordPage';
 import { LogoutPage } from '@/modules/auth/pages/LogoutPage';
 import { HomePage } from '@/modules/home/pages/HomePage';
 import { ProfilePage } from '@/modules/profile/pages/ProfilePage';
+import DashboardPage from './modules/dashboard/DashboardPage';
+import DashboardLayout from './modules/dashboard/components/DashboardLayout';
 
 function App() {
   return (
@@ -19,6 +21,12 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
       <Route path="/logout" element={<LogoutPage />} />
+
+      {/* Admin routes */}
+      <Route path="/admin" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+        <Route index element={<DashboardPage />} />
+      </Route>
+
 
       {/* Protected routes */}
       <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>

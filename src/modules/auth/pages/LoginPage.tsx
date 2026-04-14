@@ -37,6 +37,16 @@ export const LoginPage = () => {
       const token = response.data?.token as string | undefined;
       if (token) {
         tokenStore.set(token);
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.role === 'admin') {
+            toast.success('Welcome Admin!');
+            navigate('/admin');
+            return;
+          }
+        } catch (e) {
+          // Fallback if token is unparseable
+        }
         toast.success('Logged in successfully.');
         navigate('/');
         return;
@@ -64,7 +74,18 @@ export const LoginPage = () => {
     setLoading(true);
     try {
       const response = await authApi.verifyLoginOtp(email, otp);
-      tokenStore.set(response.data.token);
+      const token = response.data.token;
+      tokenStore.set(token);
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.role === 'admin') {
+          toast.success('Welcome Admin!');
+          navigate('/admin');
+          return;
+        }
+      } catch (e) {
+        // Fallback
+      }
       toast.success('Logged in successfully.');
       navigate('/');
     } catch (error: any) {

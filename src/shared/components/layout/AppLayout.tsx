@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, User, LogOut, Search, ShoppingCart, Bell } from 'lucide-react';
+import { Home, User, LogOut, Search, ShoppingCart, Bell, LayoutDashboard } from 'lucide-react';
 import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
@@ -12,10 +12,20 @@ import type { CurrentUser } from '@/modules/auth/types/auth.types';
 
 export const AppLayout = () => {
   const [user, setUser] = useState<CurrentUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = tokenStore.get();
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        setIsAdmin(payload.role === 'admin');
+      } catch (e) {
+        // ignore
+      }
+    }
     authApi.getMe()
       .then((res) => setUser(res.data as CurrentUser))
       .catch(() => {
@@ -82,6 +92,15 @@ export const AppLayout = () => {
 
             {/* User actions */}
             <div className="flex items-center gap-1 sm:gap-2 pl-2 border-l border-border">
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors border border-orange-200 shadow-sm"
+                >
+                  <LayoutDashboard className="size-4" />
+                  <span>Dashboard</span>
+                </Link>
+              )}
               <ThemeToggle />
               <Link
                 to="/profile"

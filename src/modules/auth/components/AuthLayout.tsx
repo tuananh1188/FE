@@ -53,7 +53,7 @@ export const AuthLayout = () => {
                   "text-sm font-medium transition-colors relative pb-2",
                   location.pathname === "/register"
                     ? "text-black after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-orange-600"
-                    : "text-gray-400 hover:text-gray-600",
+                    : "text-gray-400 hover:text-orange-600",
                 )}
               >
                 Create Account
@@ -61,10 +61,10 @@ export const AuthLayout = () => {
               <Link
                 to="/login"
                 className={cn(
-                  "text-sm font-medium transition-colors",
+                  "text-sm font-medium transition-colors relative pb-2",
                   location.pathname === "/login"
-                    ? "text-black"
-                    : "text-gray-400 hover:text-gray-600",
+                    ? "text-black after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-orange-600"
+                    : "text-gray-400 hover:text-orange-600",
                 )}
               >
                 Sign In
