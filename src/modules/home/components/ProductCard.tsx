@@ -17,7 +17,7 @@ export function ProductCard({ name, imageUrl, price, originalPrice, discount, so
         <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md">
             <div className="relative aspect-square bg-gray-100">
                 {discount && discount > 0 && <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-{discount}%</span>}
-                <img src={imageUrl} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" />
+                <img src={imageUrl} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" crossOrigin="anonymous" referrerPolicy="no-referrer" />
             </div>
             <CardContent className="p-3">
                 <h4 className="text-[15px] font-semibold truncate">{name}</h4>

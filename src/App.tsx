@@ -10,6 +10,7 @@ import { HomePage } from '@/modules/home/pages/HomePage';
 import { ProfilePage } from '@/modules/profile/pages/ProfilePage';
 import DashboardPage from './modules/dashboard/DashboardPage';
 import DashboardLayout from './modules/dashboard/components/DashboardLayout';
+import AdminProductsPage from './modules/dashboard/AdminProductsPage';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
       {/* Admin routes */}
       <Route path="/admin" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
         <Route index element={<DashboardPage />} />
+        <Route path="products" element={<AdminProductsPage />} />
       </Route>
 
 
