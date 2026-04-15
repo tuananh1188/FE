@@ -1,23 +1,14 @@
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
+import type { ProductCardProps } from "../types/product.types";
 
-interface ProductCardProps {
-    name: string;
-    imageUrl: string;
-    price?: number;
-    originalPrice: number;
-    discount?: number;
-    soldPercentage?: number;
-    soldCount?: number;
-    showBuyButton?: boolean;
-}
 
-export function ProductCard({ name, imageUrl, price, originalPrice, discount, soldPercentage, soldCount, showBuyButton }: ProductCardProps) {
+export function ProductCard({ name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton }: ProductCardProps) {
     return (
         <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md">
             <div className="relative aspect-square bg-gray-100">
                 {discount && discount > 0 && <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-{discount}%</span>}
-                <img src={imageUrl} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                <img src={images[0]} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" crossOrigin="anonymous" referrerPolicy="no-referrer" />
             </div>
             <CardContent className="p-3">
                 <h4 className="text-[15px] font-semibold truncate">{name}</h4>
@@ -32,8 +23,8 @@ export function ProductCard({ name, imageUrl, price, originalPrice, discount, so
                             <span className="text-md text-[#C83B1E] font-bold">${originalPrice.toFixed(2)}</span>
                         )}
                     </div>
-                    {(!soldPercentage || soldPercentage <= 0) && soldCount !== undefined && (
-                        <span className="text-[12px] text-gray-500 whitespace-nowrap">{soldCount} sold</span>
+                    {(!soldPercentage || soldPercentage <= 0) && totalSold !== undefined && (
+                        <span className="text-[12px] text-gray-500 whitespace-nowrap">{totalSold} sold</span>
                     )}
                 </div>
                 {soldPercentage && soldPercentage > 0 && <div className="mt-3 bg-gray-100 h-1.5 rounded-full overflow-hidden">

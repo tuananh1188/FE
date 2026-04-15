@@ -1,5 +1,5 @@
 import { Zap } from 'lucide-react';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '../../products/components/ProductCard';
 import { useEffect, useState } from 'react';
 import { productApi } from '@/modules/dashboard/api/product.api';
 import type { Product } from '@/modules/dashboard/api/product.api';
