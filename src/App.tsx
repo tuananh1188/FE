@@ -11,6 +11,7 @@ import { ProfilePage } from '@/modules/profile/pages/ProfilePage';
 import DashboardPage from './modules/dashboard/DashboardPage';
 import DashboardLayout from './modules/dashboard/components/DashboardLayout';
 import AdminProductsPage from './modules/dashboard/AdminProductsPage';
+import ProductPage from './modules/products/ProductPage';
 
 function App() {
   return (
@@ -35,6 +36,9 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/me" element={<Navigate to="/profile" replace />} />
+        {/* Category routes */}
+        <Route path="/categories" element={<ProductPage />} />
+        <Route path="/categories/:slug" element={<ProductPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

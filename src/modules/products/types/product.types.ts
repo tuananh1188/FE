@@ -1,5 +1,5 @@
 export interface ProductCardProps {
-    _id: string;
+    id?: string;
     name: string;
     images: string[];
     price?: number;
@@ -8,5 +8,6 @@ export interface ProductCardProps {
     soldPercentage?: number;
     totalSold?: number;
     showBuyButton?: boolean;
+    buttonText?: string;
     tag?: string;
 }

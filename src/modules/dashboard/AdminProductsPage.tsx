@@ -7,10 +7,8 @@ import type { ColumnsType } from 'antd/es/table';
 import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw } from 'lucide-react';
 import { productApi, type Product, type ProductPayload } from './api/product.api';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const CATEGORIES = ['Shoes', 'Audio', 'Accessories', 'Camera', 'Wearables', 'Clothing', 'Flash Sale', 'Other'];
+const CATEGORIES = ['Electronics', 'Fashion', 'Home & Kitchen', 'Beauty & Personal Care', 'Flash Sale', 'Other'];
 
-// ─── Component ────────────────────────────────────────────────────────────────
 const AdminProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
@@ -21,7 +19,6 @@ const AdminProductsPage: React.FC = () => {
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
     const [form] = Form.useForm();
 
-    // ── Fetch ─────────────────────────────────────────────────────────────────
     const fetchProducts = useCallback(async (search?: string) => {
         setLoading(true);
         try {
@@ -36,13 +33,13 @@ const AdminProductsPage: React.FC = () => {
 
     useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
-    // Debounced search
+
     useEffect(() => {
         const t = setTimeout(() => fetchProducts(searchQuery), 400);
         return () => clearTimeout(t);
     }, [searchQuery, fetchProducts]);
 
-    // ── Handlers ──────────────────────────────────────────────────────────────
+
     const openAdd = () => {
         setEditingProduct(null);
         setPreviewUrls([]);
@@ -133,7 +130,7 @@ const AdminProductsPage: React.FC = () => {
         setPreviewUrls(urls);
     };
 
-    // ── Columns ───────────────────────────────────────────────────────────────
+
     const columns: ColumnsType<Product> = [
         {
             title: '#',
@@ -254,7 +251,6 @@ const AdminProductsPage: React.FC = () => {
         },
     ];
 
-    // ── Render ────────────────────────────────────────────────────────────────
     return (
         <>
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 min-h-[600px]">

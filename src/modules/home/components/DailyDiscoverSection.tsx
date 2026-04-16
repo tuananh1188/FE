@@ -37,7 +37,7 @@ export const DailyDiscoverSection = () => {
       <h2 className="text-xl font-bold mb-8">Daily Discover</h2>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-10">
         {products.slice(0, 6).map((item, index) => (
-          <ProductCard key={index} name={item.name} imageUrl={item.images?.[0] ?? '/placeholder.jpg'} originalPrice={item.originalPrice} soldCount={item.totalSold} showBuyButton />
+          <ProductCard key={index} name={item.name} images={[item.images?.[0] ?? '/placeholder.jpg']} originalPrice={item.originalPrice} totalSold={item.totalSold} showBuyButton />
         ))}.
       </div>
       {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}

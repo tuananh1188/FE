@@ -40,7 +40,7 @@ export const FlashSaleSection = () => {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4">
         {products.slice(0, 5).map((item) => (
-          <ProductCard key={item._id} name={item.name} imageUrl={item.images?.[0] ?? '/placeholder.jpg'} price={item.price} originalPrice={item.originalPrice} discount={item.discount} soldPercentage={item.soldPercentage} />
+          <ProductCard key={item._id} name={item.name} images={[item.images?.[0] ?? '/placeholder.jpg']} price={item.price} originalPrice={item.originalPrice} discount={item.discount} soldPercentage={item.soldPercentage} />
         ))}
       </div>
       {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}

@@ -75,7 +75,7 @@ export const AppLayout = () => {
           {/* Nav links */}
           <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-muted-foreground">
             <a href="#" className="text-[#C83B1E]">Flash Sales</a>
-            <a href="#" className="hover:text-foreground">Categories</a>
+            <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Categories</Link>
             <a href="#" className="hover:text-foreground">Brands</a>
             <a href="#" className="hover:text-foreground">Vouchers</a>
           </nav>
@@ -115,7 +115,7 @@ export const AppLayout = () => {
                 <span className="hidden sm:inline">Profile</span>
               </Link>
               <Avatar className="size-8">
-                <AvatarImage src={user?.avatarUrl} alt={user?.email} />
+                <AvatarImage src={user?.avatarUrl} alt={user?.email} referrerPolicy="no-referrer" crossOrigin="anonymous" />
                 <AvatarFallback className="text-xs">{initials}</AvatarFallback>
               </Avatar>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground hover:text-foreground px-2">
