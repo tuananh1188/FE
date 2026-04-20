@@ -1,16 +1,24 @@
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const CATEGORIES = [
-    { name: 'Electronics', slug: 'electronics' },
-    { name: 'Fashion', slug: 'fashion' },
-    { name: 'Home & Kitchen', slug: 'home' },
-    { name: 'Beauty & Personal Care', slug: 'beauty' }
-];
+import { categoryApi, type Category } from "../../../shared/api/category.api";
 
 export const FilterSideBar = () => {
     const navigate = useNavigate();
     const { slug } = useParams();
+    const [categories, setCategories] = useState<Category[]>([]);
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await categoryApi.getAll();
+                setCategories(res.data.data);
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     return (
         <aside className="w-64 flex-shrink-0 pr-10 hidden lg:block">
@@ -19,7 +27,7 @@ export const FilterSideBar = () => {
                 <div>
                     <h4 className="text-gray-900 text-xs font-black uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Category</h4>
                     <div className="space-y-3">
-                        {CATEGORIES.map((cat) => (
+                        {categories.map((cat) => (
                             <label key={cat.slug} className="flex items-center gap-3 cursor-pointer group">
                                 <input 
                                     type="checkbox" 
@@ -38,6 +46,7 @@ export const FilterSideBar = () => {
                                 </span>
                             </label>
                         ))}
+                        {categories.length === 0 && <p className="text-xs text-gray-400">Loading categories...</p>}
                     </div>
                 </div>
 

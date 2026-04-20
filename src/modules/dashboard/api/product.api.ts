@@ -1,11 +1,12 @@
 import { http } from '../../../shared/api/http';
+import type { Category } from '../../../shared/api/category.api';
 
 export interface ProductPayload {
     name: string;
     description: string;
     originalPrice: number;
     discount?: number;
-    category: string;
+    category: string; // This remains string as we send the ID to the backend
     images: string[];
     stock: number;
 }
@@ -18,7 +19,7 @@ export interface Product {
     price: number;
     originalPrice: number;
     discount: number;
-    category: string;
+    category: Category; // Updated to Category object
     images: string[];
     stock: number;
     rating: number;

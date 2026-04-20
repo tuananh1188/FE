@@ -17,8 +17,7 @@ export const DailyDiscoverSection = () => {
         const response = await productApi.getAll();
 
         if (response.data.success) {
-          const noDiscountProducts = response.data.data.filter((p: Product) => !p.discount || p.discount === 0);
-          setProducts(noDiscountProducts);
+          setProducts(response.data.data);
         }
       } catch (error: any) {
         setError(error.message || 'Something went wrong!')

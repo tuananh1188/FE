@@ -1,38 +1,33 @@
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { productApi, type Product } from '@/modules/dashboard/api/product.api';
+import { categoryApi, type Category } from '@/shared/api/category.api';
 import { FilterSideBar } from './components/FilterSideBar';
 import { SortHeader, type SortOption } from './components/SortHeader';
 import { ProductList } from './components/ProductList';
 import { Pagination } from './components/Pagination';
 import { Breadcrumb } from './components/Breadcrumb';
 
-// Map slug → display name (khớp với giá trị category trong DB)
-const CATEGORY_MAP: Record<string, string> = {
-    electronics: 'Electronics',
-    fashion: 'Fashion',
-    home: 'Home & Kitchen',
-    beauty: 'Beauty & Personal Care',
-};
-
 const ITEMS_PER_PAGE = 24;
 
 export default function ProductPage() {
     const { slug } = useParams<{ slug: string }>();
 
-    const categoryName = slug
-        ? (CATEGORY_MAP[slug] ?? slug.charAt(0).toUpperCase() + slug.slice(1))
-        : 'All Products';
-
-    // Lấy giá trị category truyền lên API (dùng displayName vì DB lưu dạng tên đầy đủ)
-    const categoryFilter = slug ? CATEGORY_MAP[slug] ?? slug : undefined;
-
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [sortOption, setSortOption] = useState<SortOption>('top_sales');
     const [currentPage, setCurrentPage] = useState(1);
     
+    // Find active category
+    const activeCategory = useMemo(() => 
+        categories.find(c => c.slug === slug),
+    [categories, slug]);
+
+    const categoryName = activeCategory?.name ?? 'All Products';
+    const categoryId = activeCategory?._id;
+
     // Explicitly track filter/sort changes without triggering endless useEffects
     const prevSlug = useRef(slug);
     const prevSort = useRef(sortOption);
@@ -46,11 +41,24 @@ export default function ProductPage() {
     }, [slug, sortOption]);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchInitialData = async () => {
             try {
                 setLoading(true);
                 setError(null);
-                const res = await productApi.getAll(undefined, categoryFilter);
+                
+                // Fetch categories if not already fetched
+                let currentCategories = categories;
+                if (categories.length === 0) {
+                    const catRes = await categoryApi.getAll();
+                    currentCategories = catRes.data.data;
+                    setCategories(currentCategories);
+                }
+
+                // Find category ID from slug
+                const cat = currentCategories.find(c => c.slug === slug);
+                const filterId = slug ? cat?._id : undefined;
+
+                const res = await productApi.getAll(undefined, filterId);
                 if (res.data.success) {
                     setProducts(res.data.data);
                 }
@@ -60,8 +68,8 @@ export default function ProductPage() {
                 setLoading(false);
             }
         };
-        fetchProducts();
-    }, [slug, categoryFilter]); // re-fetch khi đổi category
+        fetchInitialData();
+    }, [slug]); // re-fetch khi đổi category
 
     const sortedProducts = useMemo(() => {
         let sorted = [...products];

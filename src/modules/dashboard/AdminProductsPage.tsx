@@ -6,11 +6,11 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw } from 'lucide-react';
 import { productApi, type Product, type ProductPayload } from './api/product.api';
-
-const CATEGORIES = ['Electronics', 'Fashion', 'Home & Kitchen', 'Beauty & Personal Care', 'Flash Sale', 'Other'];
+import { categoryApi, type Category } from '../../shared/api/category.api';
 
 const AdminProductsPage: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [modalOpen, setModalOpen] = useState(false);
@@ -31,7 +31,19 @@ const AdminProductsPage: React.FC = () => {
         }
     }, []);
 
-    useEffect(() => { fetchProducts(); }, [fetchProducts]);
+    const fetchCategories = useCallback(async () => {
+        try {
+            const res = await categoryApi.getAll();
+            setCategories(res.data.data);
+        } catch {
+            message.error('Failed to load categories');
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchProducts();
+        fetchCategories();
+    }, [fetchProducts, fetchCategories]);
 
 
     useEffect(() => {
@@ -55,7 +67,7 @@ const AdminProductsPage: React.FC = () => {
             description: product.description,
             originalPrice: product.originalPrice,
             discount: product.discount,
-            category: product.category,
+            category: product.category?._id, // Set the category ID as the value
             images: (product.images ?? []).join('\n'),
             stock: product.stock,
         });
@@ -164,11 +176,16 @@ const AdminProductsPage: React.FC = () => {
         {
             title: 'Category',
             dataIndex: 'category',
-            filters: CATEGORIES.map((c) => ({ text: c, value: c })),
-            onFilter: (value, record) => record.category === value,
-            render: (cat) => (
-                <Tag className="rounded-full border-none px-3 font-medium" color="orange">{cat}</Tag>
-            ),
+            filters: categories.map((c) => ({ text: c.name, value: c._id })),
+            onFilter: (value, record) => record.category?._id === value,
+            render: (cat: any) => {
+                const name = typeof cat === 'string' ? cat : cat?.name;
+                return (
+                    <Tag className="rounded-full border-none px-3 font-medium" color="orange">
+                        {name || 'No Category'}
+                    </Tag>
+                );
+            },
         },
         {
             title: 'Price',
@@ -408,7 +425,7 @@ const AdminProductsPage: React.FC = () => {
                             <Select
                                 placeholder="Select category"
                                 className="w-full"
-                                options={CATEGORIES.map((c) => ({ label: c, value: c }))}
+                                options={categories.map((c) => ({ label: c.name, value: c._id }))}
                             />
                         </Form.Item>
 
