@@ -10,4 +10,5 @@ export interface ProductCardProps {
     showBuyButton?: boolean;
     buttonText?: string;
     tag?: string;
+    onClick?: () => void;
 }

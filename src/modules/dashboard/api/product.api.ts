@@ -1,7 +1,7 @@
 import { http } from '../../../shared/api/http';
 import type { Category } from '../../../shared/api/category.api';
 
-export interface ProductPayload {
+export type ProductPayload = {
     name: string;
     description: string;
     originalPrice: number;
@@ -11,7 +11,7 @@ export interface ProductPayload {
     stock: number;
 }
 
-export interface Product {
+export type Product = {
     _id: string;
     name: string;
     slug: string;
@@ -30,19 +30,19 @@ export interface Product {
 
 export const productApi = {
     getAll: (search?: string, category?: string) =>
-        http.get<{ success: boolean; count: number; data: Product[] }>('/product', {
+        http.get<{ success: boolean; count: number; data: Product[] }>('product', {
             params: { search, category },
         }),
 
     getById: (id: string) =>
-        http.get<{ success: boolean; data: Product }>(`/product/${id}`),
+        http.get<{ success: boolean; data: Product }>(`product/${id}`),
 
     create: (payload: ProductPayload) =>
-        http.post<{ success: boolean; data: Product }>('/product', payload),
+        http.post<{ success: boolean; data: Product }>('product', payload),
 
     update: (id: string, payload: Partial<ProductPayload>) =>
-        http.put<{ success: boolean; data: Product }>(`/product/${id}`, payload),
+        http.put<{ success: boolean; data: Product }>(`product/${id}`, payload),
 
     delete: (id: string) =>
-        http.delete<{ success: boolean }>(`/product/${id}`),
+        http.delete<{ success: boolean }>(`product/${id}`),
 };

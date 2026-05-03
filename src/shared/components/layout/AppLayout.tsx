@@ -9,12 +9,14 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { cn } from '@/shared/lib/utils';
 import type { CurrentUser } from '@/modules/auth/types/auth.types';
+import { useCart } from '@/shared/context/CartContext';
 
 export const AppLayout = () => {
   const [user, setUser] = useState<CurrentUser | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { cartTotalCount } = useCart();
 
   useEffect(() => {
     const token = tokenStore.get();
@@ -83,10 +85,14 @@ export const AppLayout = () => {
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Shopping & Notifications */}
             <div className="flex items-center gap-3 mr-2">
-              <div className="relative cursor-pointer text-muted-foreground hover:text-foreground">
+              <Link to="/cart" className="relative cursor-pointer text-muted-foreground hover:text-foreground">
                 <ShoppingCart className="size-5" />
-                <span className="absolute -top-2 -right-2 bg-[#C83B1E] text-white text-[10px] rounded-full size-4 flex items-center justify-center">2</span>
-              </div>
+                {cartTotalCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[#C83B1E] text-white text-[10px] rounded-full size-4 flex items-center justify-center">
+                    {cartTotalCount}
+                  </span>
+                )}
+              </Link>
               <Bell className="size-5 cursor-pointer text-muted-foreground hover:text-foreground" />
             </div>
 

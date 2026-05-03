@@ -1,5 +1,6 @@
 import { Zap } from 'lucide-react';
 import { ProductCard } from '../../products/components/ProductCard';
+import { ProductDetailModal } from '../../products/components/ProductDetailModal';
 import { useEffect, useState } from 'react';
 import { productApi } from '@/modules/dashboard/api/product.api';
 import type { Product } from '@/modules/dashboard/api/product.api';
@@ -11,6 +12,7 @@ export const FlashSaleSection = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -60,11 +62,26 @@ export const FlashSaleSection = () => {
       </div>
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 p-4">
         {products.slice(0, 5).map((item) => (
-          <ProductCard key={item._id} name={item.name} images={[item.images?.[0] ?? '/placeholder.jpg']} price={item.price} originalPrice={item.originalPrice} discount={item.discount} soldPercentage={item.soldPercentage} />
+          <ProductCard
+            key={item._id}
+            id={item._id}
+            name={item.name}
+            images={[item.images?.[0] ?? '/placeholder.jpg']}
+            price={item.price}
+            originalPrice={item.originalPrice}
+            discount={item.discount}
+            soldPercentage={item.soldPercentage}
+            onClick={() => setSelectedProductId(item._id)}
+          />
         ))}
       </div>
       {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}
       {products.length > 0 && <Button variant="outline" className="border-[#C83B1E] text-[#C83B1E] hover:bg-red-50 px-10">Load More</Button>}
+
+      <ProductDetailModal
+        productId={selectedProductId}
+        onClose={() => setSelectedProductId(null)}
+      />
     </section>
   );
 };

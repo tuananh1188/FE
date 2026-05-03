@@ -3,9 +3,9 @@ import { Button } from "@/shared/components/ui/button";
 import type { ProductCardProps } from "../types/product.types";
 
 
-export function ProductCard({ name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now" }: ProductCardProps) {
+export function ProductCard({ name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now", onClick }: ProductCardProps) {
     return (
-        <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md">
+        <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md" onClick={onClick}>
             <div className="relative aspect-square bg-gray-100">
                 {(discount ?? 0) > 0 && <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-{discount}%</span>}
                 <img src={images?.[0] ?? '/placeholder.jpg'} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" crossOrigin="anonymous" referrerPolicy="no-referrer" />
