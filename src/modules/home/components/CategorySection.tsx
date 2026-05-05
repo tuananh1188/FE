@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, LayoutGrid } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Zap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { MdOutlineLaptopChromebook } from "react-icons/md";
 import { IoShirtOutline, IoHomeOutline } from "react-icons/io5";
@@ -12,6 +12,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   'fashion': <IoShirtOutline style={{ color: '#C83B1E' }} />,
   'home-&-kitchen': <IoHomeOutline style={{ color: '#C83B1E' }} />,
   'beauty-&-personal-care': <GiLipstick style={{ color: '#C83B1E' }} />,
+  'flash-sale': <Zap className="size-5 text-[#C83B1E] fill-[#C83B1E]" />,
 };
 
 export const CategorySection = () => {

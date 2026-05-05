@@ -1,3 +1,4 @@
+import React from "react";
 import { Avatar, Tag, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { BarChart3, MoreHorizontal } from "lucide-react";

@@ -7,12 +7,14 @@ import type { Product } from '@/modules/dashboard/api/product.api';
 import { categoryApi } from '@/shared/api/category.api';
 import { Button } from '@/shared/components/ui/button';
 import { CountdownTimer } from './CountdownTimer';
+import { useNavigate } from 'react-router-dom';
 
 export const FlashSaleSection = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -26,17 +28,13 @@ export const FlashSaleSection = () => {
         );
 
         // 2. Fetch products
-        // If 'Flash Sale' category ID exists, use it. Otherwise fetch all and filter.
         const res = await productApi.getAll(undefined, flashSaleCategory?._id);
         
         if (res.data.success) {
           let data = res.data.data;
-          
-          // Fallback: If no category ID was found, filter by discount in frontend
           if (!flashSaleCategory) {
             data = data.filter(p => p.discount && p.discount > 0);
           }
-          
           setProducts(data);
         }
       } catch (error: any) {
@@ -75,8 +73,20 @@ export const FlashSaleSection = () => {
           />
         ))}
       </div>
+      
       {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}
-      {products.length > 0 && <Button variant="outline" className="border-[#C83B1E] text-[#C83B1E] hover:bg-red-50 px-10">Load More</Button>}
+      
+      {products.length > 0 && (
+        <div className="text-center mt-6">
+          <Button 
+            variant="outline" 
+            className="border-[#C83B1E] text-[#C83B1E] hover:bg-red-50 px-10 hover:cursor-pointer"
+            onClick={() => navigate('/categories/flash-sale')}
+          >
+            View All Flash Sale
+          </Button>
+        </div>
+      )}
 
       <ProductDetailModal
         productId={selectedProductId}

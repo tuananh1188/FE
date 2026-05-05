@@ -25,6 +25,7 @@ export type Product = {
     rating: number;
     soldPercentage: number;
     totalSold: number;
+    reviewCount: number;
     createdAt: string;
 }
 

@@ -1,14 +1,39 @@
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import type { ProductCardProps } from "../types/product.types";
+import { useState, useEffect } from "react";
 
 
 export function ProductCard({ name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now", onClick }: ProductCardProps) {
+    const primaryImage = images?.[0] || '/products/electronics.png';
+    const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png'); // Start with local placeholder
+
+    useEffect(() => {
+        if (!primaryImage.startsWith('http')) {
+            setDisplayImage(primaryImage);
+            return;
+        }
+
+        // Silent pre-check to avoid console 404
+        const img = new Image();
+        img.src = primaryImage;
+        img.onload = () => setDisplayImage(primaryImage);
+        img.onerror = () => {
+            // If it's a beauty product, use beauty placeholder, etc.
+            // For now, default to electronics as a safe bet
+            setDisplayImage('/products/electronics.png');
+        };
+    }, [primaryImage]);
+
     return (
         <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md" onClick={onClick}>
             <div className="relative aspect-square bg-gray-100">
                 {(discount ?? 0) > 0 && <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-{discount}%</span>}
-                <img src={images?.[0] ?? '/placeholder.jpg'} alt={name} className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" crossOrigin="anonymous" referrerPolicy="no-referrer" />
+                <img 
+                    src={displayImage} 
+                    alt={name} 
+                    className="w-full h-full object-cover rounded-sm group-hover:scale-105 transition-transform duration-300" 
+                />
             </div>
             <CardContent className="p-3">
                 <h4 className="text-[15px] font-semibold truncate">{name}</h4>

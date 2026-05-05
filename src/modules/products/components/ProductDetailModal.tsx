@@ -4,6 +4,7 @@ import type { Product } from '@/modules/dashboard/api/product.api';
 import { productApi } from '@/modules/dashboard/api/product.api';
 import { useCart } from '@/shared/context/CartContext';
 import { toast } from 'sonner';
+import { ReviewSection } from './ReviewSection';
 
 interface ProductDetailModalProps {
     productId: string | null;
@@ -16,7 +17,10 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [imageLoaded, setImageLoaded] = useState(false);
+    const [localRating, setLocalRating] = useState(0);
+    const [localReviewCount, setLocalReviewCount] = useState(0);
     const { addToCart } = useCart();
+    const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png');
 
     useEffect(() => {
         if (!productId) {
@@ -33,6 +37,8 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                 const res = await productApi.getById(productId);
                 if (res.data.success) {
                     setProduct(res.data.data);
+                    setLocalRating(res.data.data.rating ?? 0);
+                    setLocalReviewCount(res.data.data.reviewCount ?? 0);
                 }
             } catch (err) {
                 console.error('Failed to load product details:', err);
@@ -42,6 +48,29 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         };
         fetchProduct();
     }, [productId]);
+
+    useEffect(() => {
+        if (product && product.images[selectedImageIndex]) {
+            const primaryImage = product.images[selectedImageIndex];
+            if (!primaryImage.startsWith('http')) {
+                setDisplayImage(primaryImage);
+                setImageLoaded(true);
+                return;
+            }
+
+            // Silent pre-check
+            const img = new Image();
+            img.src = primaryImage;
+            img.onload = () => {
+                setDisplayImage(primaryImage);
+                setImageLoaded(true);
+            };
+            img.onerror = () => {
+                setDisplayImage('/products/electronics.png');
+                setImageLoaded(true);
+            };
+        }
+    }, [product, selectedImageIndex]);
 
     if (!productId) return null;
 
@@ -54,7 +83,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         setSelectedImageIndex((prev) =>
             prev === 0 ? product.images.length - 1 : prev - 1
         );
-        setImageLoaded(false);
     };
 
     const handleNextImage = () => {
@@ -62,7 +90,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         setSelectedImageIndex((prev) =>
             prev === product.images.length - 1 ? 0 : prev + 1
         );
-        setImageLoaded(false);
     };
 
     const decrementQty = () => setQuantity((q) => Math.max(1, q - 1));
@@ -80,9 +107,9 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         onClose();
     };
 
-    // Generate mock rating data (since the backend has a rating field)
-    const rating = product?.rating ?? 4.5;
-    const reviewCount = product?.totalSold ? Math.ceil(product.totalSold * 0.3) : 0;
+    // Use live rating state
+    const rating = localRating;
+    const reviewCount = localReviewCount;
 
     return (
         <div
@@ -125,16 +152,9 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         </span>
                                     )}
                                     <img
-                                        src={product.images[selectedImageIndex] ?? '/placeholder.jpg'}
+                                        src={displayImage}
                                         alt={product.name}
                                         className={`w-full h-full object-cover transition-all duration-500 ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
-                                        crossOrigin="anonymous"
-                                        referrerPolicy="no-referrer"
-                                        onLoad={() => setImageLoaded(true)}
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'https://placehold.co/500x500?text=No+Image';
-                                            setImageLoaded(true);
-                                        }}
                                     />
                                     {!imageLoaded && (
                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -166,7 +186,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         {product.images.map((img, idx) => (
                                             <button
                                                 key={idx}
-                                                onClick={() => { setSelectedImageIndex(idx); setImageLoaded(false); }}
+                                                onClick={() => { setSelectedImageIndex(idx); }}
                                                 className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
                                                     idx === selectedImageIndex
                                                         ? 'border-[#C83B1E] shadow-sm'
@@ -177,11 +197,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                                     src={img}
                                                     alt={`${product.name} ${idx + 1}`}
                                                     className="w-full h-full object-cover"
-                                                    crossOrigin="anonymous"
-                                                    referrerPolicy="no-referrer"
-                                                    onError={(e) => {
-                                                        (e.target as HTMLImageElement).src = 'https://placehold.co/64x64?text=Img';
-                                                    }}
                                                 />
                                             </button>
                                         ))}
@@ -329,6 +344,19 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                     <div className="flex flex-col items-center justify-center py-32 gap-3">
                         <p className="text-red-500 font-semibold">Product not found</p>
                     </div>
+                )}
+
+                {/* Reviews Section */}
+                {product && (
+                    <ReviewSection
+                        productId={product._id}
+                        productRating={localRating}
+                        reviewCount={localReviewCount}
+                        onRatingUpdated={(newRating, newCount) => {
+                            setLocalRating(newRating);
+                            setLocalReviewCount(newCount);
+                        }}
+                    />
                 )}
             </div>
 
