@@ -447,26 +447,41 @@ const AdminProductsPage: React.FC = () => {
                         <Form.Item
                             label="Available Sizes"
                             name="sizes"
-                            tooltip="Enter sizes and press Enter (e.g. S, M, L, XL)"
+                            tooltip="Select sizes or type new ones"
                         >
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Add sizes..."
+                                placeholder="Select or add sizes..."
                                 className="rounded-lg"
+                                options={[
+                                    { value: 'S', label: 'S' },
+                                    { value: 'M', label: 'M' },
+                                    { value: 'L', label: 'L' },
+                                    { value: 'XL', label: 'XL' },
+                                    { value: 'XXL', label: 'XXL' },
+                                ]}
                             />
                         </Form.Item>
 
                         <Form.Item
                             label="Available Colors"
                             name="colors"
-                            tooltip="Enter colors and press Enter (e.g. Red, Blue, Black)"
+                            tooltip="Select colors or type new ones"
                         >
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Add colors..."
+                                placeholder="Select or add colors..."
                                 className="rounded-lg"
+                                options={[
+                                    { value: 'Red', label: 'Red' },
+                                    { value: 'Blue', label: 'Blue' },
+                                    { value: 'White', label: 'White' },
+                                    { value: 'Black', label: 'Black' },
+                                    { value: 'Green', label: 'Green' },
+                                    { value: 'Yellow', label: 'Yellow' },
+                                ]}
                             />
                         </Form.Item>
                     </div>

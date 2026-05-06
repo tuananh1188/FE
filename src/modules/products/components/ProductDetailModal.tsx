@@ -109,7 +109,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const handleAddToCart = () => {
         if (!product) return;
 
-        // Validation for variants
         if (product.sizes && product.sizes.length > 0 && !selectedSize) {
             toast.error('Vui lòng chọn kích cỡ (Size)');
             return;
@@ -122,6 +121,26 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         addToCart(product, quantity, selectedSize, selectedColor);
         toast.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`);
         onClose();
+    };
+
+    const handleBuyNow = async () => {
+        if (!product) return;
+        if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+            toast.error('Vui lòng chọn kích cỡ (Size)');
+            return;
+        }
+        if (product.colors && product.colors.length > 0 && !selectedColor) {
+            toast.error('Vui lòng chọn màu sắc');
+            return;
+        }
+
+        try {
+            await addToCart(product, quantity, selectedSize, selectedColor);
+            navigate('/cart');
+            onClose();
+        } catch (err) {
+            // Error handled by context
+        }
     };
 
     // Use live rating state
@@ -370,6 +389,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         Add to Cart
                                     </button>
                                     <button
+                                        onClick={handleBuyNow}
                                         disabled={product.stock <= 0}
                                         className="px-6 py-3.5 rounded-xl font-semibold text-sm border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                                     >

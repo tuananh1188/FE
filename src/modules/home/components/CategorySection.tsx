@@ -1,19 +1,22 @@
 import { useEffect, useState } from 'react';
-import { ChevronRight, LayoutGrid, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { MdOutlineLaptopChromebook } from "react-icons/md";
-import { IoShirtOutline, IoHomeOutline } from "react-icons/io5";
-import { GiLipstick } from "react-icons/gi";
-import { categoryApi, type Category } from '../../../shared/api/category.api';
+import { ChevronRight, LayoutGrid, Zap, Laptop, Shirt, Home, Sparkles } from 'lucide-react';
 
-// Map slugs to original icons
-const ICON_MAP: Record<string, React.ReactNode> = {
-  'electronics': <MdOutlineLaptopChromebook style={{ color: '#C83B1E' }} />,
-  'fashion': <IoShirtOutline style={{ color: '#C83B1E' }} />,
-  'home-&-kitchen': <IoHomeOutline style={{ color: '#C83B1E' }} />,
-  'beauty-&-personal-care': <GiLipstick style={{ color: '#C83B1E' }} />,
-  'flash-sale': <Zap className="size-5 text-[#C83B1E] fill-[#C83B1E]" />,
+// Helper to get icon based on name or slug
+const getCategoryIcon = (name: string, slug: string) => {
+  const n = name.toLowerCase();
+  const s = slug.toLowerCase();
+  
+  if (s.includes('electronics') || n.includes('electronics')) return <Laptop className="size-6 text-[#C83B1E]" />;
+  if (s.includes('fashion') || n.includes('fashion')) return <Shirt className="size-6 text-[#C83B1E]" />;
+  if (s.includes('home') || n.includes('home')) return <Home className="size-6 text-[#C83B1E]" />;
+  if (s.includes('beauty') || n.includes('beauty')) return <Sparkles className="size-6 text-[#C83B1E]" />;
+  if (s.includes('flash') || n.includes('flash')) return <Zap className="size-6 text-[#C83B1E] fill-[#C83B1E]" />;
+  
+  return null;
 };
+
+import { Link } from 'react-router-dom';
+import { categoryApi, type Category } from '../../../shared/api/category.api';
 
 export const CategorySection = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -27,7 +30,7 @@ export const CategorySection = () => {
         const allCats = res.data.data;
         
         // Define original order (matching BE slugs)
-        const order = ['electronics', 'fashion', 'home-&-kitchen', 'beauty-&-personal-care'];
+        const order = ['electronics', 'fashion', 'home-kitchen', 'beauty-personal-care'];
         
         // Sort categories based on order, then append others
         const sorted = [...allCats].sort((a, b) => {
@@ -83,9 +86,9 @@ export const CategorySection = () => {
             className="bg-white rounded-xl p-8 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group"
           >
             <div className="size-12 rounded-full bg-red-50 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-200 overflow-hidden">
-              {/* Prioritize ICON_MAP, then cat.image, then fallback */}
-              {ICON_MAP[cat.slug] ? (
-                  ICON_MAP[cat.slug]
+              {/* Prioritize our helper, then cat.image, then fallback */}
+              {getCategoryIcon(cat.name, cat.slug) ? (
+                  getCategoryIcon(cat.name, cat.slug)
               ) : cat.image ? (
                   <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
               ) : (

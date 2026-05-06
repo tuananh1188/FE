@@ -46,12 +46,12 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
             {(size || color) && (
               <div className="flex gap-2 mt-1">
                 {size && (
-                  <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded uppercase">
+                  <span className="text-[10px] font-bold bg-[#C83B1E]/10 text-[#C83B1E] px-2 py-1 rounded border border-[#C83B1E]/20 uppercase">
                     Size: {size}
                   </span>
                 )}
                 {color && (
-                  <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded uppercase">
+                  <span className="text-[10px] font-bold bg-gray-100 text-gray-700 px-2 py-1 rounded border border-gray-200 uppercase">
                     Màu: {color}
                   </span>
                 )}
