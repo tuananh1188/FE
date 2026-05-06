@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     Table, Tag, Input, Modal, Form, InputNumber,
-    Popconfirm, message, Tooltip, Select, Spin
+    Popconfirm, message, Tooltip, Select, Spin, Upload
 } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw } from 'lucide-react';
-import { productApi, type Product, type ProductPayload } from './api/product.api';
+import type { UploadFile } from 'antd/es/upload/interface';
+import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw, UploadCloud } from 'lucide-react';
+import { productApi, type Product } from './api/product.api';
 import { categoryApi, type Category } from '../../shared/api/category.api';
 
 const AdminProductsPage: React.FC = () => {
@@ -16,7 +16,7 @@ const AdminProductsPage: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [form] = Form.useForm();
 
     const fetchProducts = useCallback(async (search?: string) => {
@@ -54,22 +54,30 @@ const AdminProductsPage: React.FC = () => {
 
     const openAdd = () => {
         setEditingProduct(null);
-        setPreviewUrls([]);
+        setFileList([]);
         form.resetFields();
         setModalOpen(true);
     };
 
     const openEdit = (product: Product) => {
         setEditingProduct(product);
-        setPreviewUrls(product.images ?? []);
+        const images = product.images ?? [];
+        setFileList(images.map((url, idx) => ({
+            uid: `-${idx}`,
+            name: `image-${idx}`,
+            status: 'done',
+            url: url,
+        })));
+
         form.setFieldsValue({
             name: product.name,
             description: product.description,
             originalPrice: product.originalPrice,
             discount: product.discount,
-            category: product.category?._id, // Set the category ID as the value
-            images: (product.images ?? []).join('\n'),
+            category: product.category?._id,
             stock: product.stock,
+            sizes: product.sizes || [],
+            colors: product.colors || [],
         });
         setModalOpen(true);
     };
@@ -88,59 +96,59 @@ const AdminProductsPage: React.FC = () => {
         try {
             const values = await form.validateFields();
 
-            // Parse newline-separated image URLs → array
-            const images: string[] = (values.images as string)
-                .split('\n')
-                .map((s: string) => s.trim())
-                .filter(Boolean);
-
-            if (images.length === 0) {
-                message.error('Please provide at least one image URL');
+            if (fileList.length === 0) {
+                message.error('Please upload at least one image');
                 return;
             }
 
-            const payload: ProductPayload = {
-                name: values.name,
-                description: values.description,
-                originalPrice: values.originalPrice,
-                discount: values.discount ?? 0,
-                category: values.category,
-                images,
-                stock: values.stock,
-            };
+            const formData = new FormData();
+            formData.append('name', values.name);
+            formData.append('description', values.description);
+            formData.append('originalPrice', String(values.originalPrice));
+            formData.append('discount', String(values.discount ?? 0));
+            formData.append('category', values.category);
+            formData.append('stock', String(values.stock));
+
+            // Append sizes and colors
+            if (values.sizes) {
+                values.sizes.forEach((s: string) => formData.append('sizes', s));
+            }
+            if (values.colors) {
+                values.colors.forEach((c: string) => formData.append('colors', c));
+            }
+
+            // Append images (both existing URLs and new files)
+            fileList.forEach(file => {
+                if (file.originFileObj) {
+                    formData.append('images', file.originFileObj);
+                } else if (file.url) {
+                    formData.append('images', file.url);
+                }
+            });
 
             setSaving(true);
             if (editingProduct) {
-                await productApi.update(editingProduct._id, payload);
+                await productApi.update(editingProduct._id, formData);
                 message.success('Product updated successfully');
             } else {
-                await productApi.create(payload);
+                await productApi.create(formData);
                 message.success('Product created successfully');
             }
             setModalOpen(false);
             fetchProducts(searchQuery);
         } catch (err: any) {
             let msg = err?.response?.data?.message ?? err?.message ?? 'Something went wrong';
-
-            // Handle validation errors from backend
             if (err?.response?.data?.errors?.length > 0) {
                 const firstError = err.response.data.errors[0];
                 msg = `${firstError.field}: ${firstError.message}`;
             }
-
             message.error(msg);
         } finally {
             setSaving(false);
         }
     };
 
-    const handleImagesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const urls = e.target.value
-            .split('\n')
-            .map((s) => s.trim())
-            .filter(Boolean);
-        setPreviewUrls(urls);
-    };
+    // Remove handleImagesChange as it's no longer needed for text area
 
 
     const columns: ColumnsType<Product> = [
@@ -375,34 +383,30 @@ const AdminProductsPage: React.FC = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Images (one URL per line)"
-                        name="images"
-                        rules={[{ required: true, message: 'Please provide at least one image URL' }]}
+                        label="Product Images"
+                        required
+                        tooltip="Upload images from your computer"
                     >
-                        <Input.TextArea
-                            rows={3}
-                            placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                            className="rounded-lg font-mono text-xs"
-                            onChange={handleImagesChange}
-                        />
+                        <Upload
+                            listType="picture-card"
+                            fileList={fileList}
+                            onPreview={(file) => {
+                                window.open(file.url || file.thumbUrl, '_blank');
+                            }}
+                            onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+                            beforeUpload={() => false} // Prevent automatic upload
+                            multiple
+                            accept="image/*"
+                            id="product-image-upload"
+                        >
+                            {fileList.length < 5 && (
+                                <div className="flex flex-col items-center">
+                                    <UploadCloud size={20} className="text-gray-400 mb-1" />
+                                    <div className="text-[10px] text-gray-500">Upload</div>
+                                </div>
+                            )}
+                        </Upload>
                     </Form.Item>
-
-                    {/* Image previews */}
-                    {previewUrls.length > 0 && (
-                        <div className="flex gap-2 mb-4 -mt-2 flex-wrap">
-                            {previewUrls.map((url, i) => (
-                                <img
-                                    key={i}
-                                    src={url}
-                                    alt={`preview-${i}`}
-                                    className="h-16 w-16 rounded-lg object-cover border border-gray-200"
-                                    crossOrigin="anonymous"
-                                    referrerPolicy="no-referrer"
-                                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                />
-                            ))}
-                        </div>
-                    )}
 
                     <div className="grid grid-cols-2 gap-4">
                         <Form.Item
@@ -410,11 +414,11 @@ const AdminProductsPage: React.FC = () => {
                             name="originalPrice"
                             rules={[{ required: true, message: 'Required' }]}
                         >
-                            <InputNumber min={0} step={0.01} prefix="$" className="w-full rounded-lg" />
+                            <InputNumber min={0} step={0.01} prefix="$" style={{ width: '100%' }} className="rounded-lg" />
                         </Form.Item>
 
                         <Form.Item label="Discount (%)" name="discount" initialValue={0}>
-                            <InputNumber min={0} max={100} suffix="%" className="w-full rounded-lg" />
+                            <InputNumber min={0} max={100} suffix="%" style={{ width: '100%' }} className="rounded-lg" />
                         </Form.Item>
 
                         <Form.Item
@@ -424,7 +428,7 @@ const AdminProductsPage: React.FC = () => {
                         >
                             <Select
                                 placeholder="Select category"
-                                className="w-full"
+                                style={{ width: '100%' }}
                                 options={categories.map((c) => ({ label: c.name, value: c._id }))}
                             />
                         </Form.Item>
@@ -435,7 +439,35 @@ const AdminProductsPage: React.FC = () => {
                             rules={[{ required: true, message: 'Required' }]}
                             initialValue={0}
                         >
-                            <InputNumber min={0} className="w-full rounded-lg" />
+                            <InputNumber min={0} style={{ width: '100%' }} className="rounded-lg" />
+                        </Form.Item>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <Form.Item
+                            label="Available Sizes"
+                            name="sizes"
+                            tooltip="Enter sizes and press Enter (e.g. S, M, L, XL)"
+                        >
+                            <Select
+                                mode="tags"
+                                style={{ width: '100%' }}
+                                placeholder="Add sizes..."
+                                className="rounded-lg"
+                            />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Available Colors"
+                            name="colors"
+                            tooltip="Enter colors and press Enter (e.g. Red, Blue, Black)"
+                        >
+                            <Select
+                                mode="tags"
+                                style={{ width: '100%' }}
+                                placeholder="Add colors..."
+                                className="rounded-lg"
+                            />
                         </Form.Item>
                     </div>
                 </Form>

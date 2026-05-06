@@ -16,6 +16,8 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const [loading, setLoading] = useState(false);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [quantity, setQuantity] = useState(1);
+    const [selectedSize, setSelectedSize] = useState<string>('');
+    const [selectedColor, setSelectedColor] = useState<string>('');
     const [imageLoaded, setImageLoaded] = useState(false);
     const [localRating, setLocalRating] = useState(0);
     const [localReviewCount, setLocalReviewCount] = useState(0);
@@ -39,6 +41,10 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                     setProduct(res.data.data);
                     setLocalRating(res.data.data.rating ?? 0);
                     setLocalReviewCount(res.data.data.reviewCount ?? 0);
+                    
+                    // Reset selections when product changes
+                    setSelectedSize('');
+                    setSelectedColor('');
                 }
             } catch (err) {
                 console.error('Failed to load product details:', err);
@@ -102,8 +108,19 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
 
     const handleAddToCart = () => {
         if (!product) return;
-        addToCart(product, quantity);
-        toast.success(`Added ${quantity} ${product.name} to cart`);
+
+        // Validation for variants
+        if (product.sizes && product.sizes.length > 0 && !selectedSize) {
+            toast.error('Vui lòng chọn kích cỡ (Size)');
+            return;
+        }
+        if (product.colors && product.colors.length > 0 && !selectedColor) {
+            toast.error('Vui lòng chọn màu sắc');
+            return;
+        }
+
+        addToCart(product, quantity, selectedSize, selectedColor);
+        toast.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`);
         onClose();
     };
 
@@ -262,9 +279,57 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                 <div className="flex items-center gap-2 mb-5">
                                     <div className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
                                     <span className={`text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                        {product.stock > 0 ? `In Stock (${product.stock} available)` : 'Out of Stock'}
+                                        {product.stock > 0 ? `Còn hàng (${product.stock} sản phẩm)` : 'Hết hàng'}
                                     </span>
                                 </div>
+
+                                {/* Size Selection */}
+                                {product.sizes && product.sizes.length > 0 && (
+                                    <div className="mb-5">
+                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                                            Kích cỡ (Size)
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.sizes.map((size) => (
+                                                <button
+                                                    key={size}
+                                                    onClick={() => setSelectedSize(size)}
+                                                    className={`px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer ${
+                                                        selectedSize === size
+                                                            ? 'border-[#C83B1E] bg-red-50 text-[#C83B1E]'
+                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    {size}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Color Selection */}
+                                {product.colors && product.colors.length > 0 && (
+                                    <div className="mb-5">
+                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
+                                            Màu sắc
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {product.colors.map((color) => (
+                                                <button
+                                                    key={color}
+                                                    onClick={() => setSelectedColor(color)}
+                                                    className={`px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer ${
+                                                        selectedColor === color
+                                                            ? 'border-[#C83B1E] bg-red-50 text-[#C83B1E]'
+                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                    }`}
+                                                >
+                                                    {color}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Quantity */}
                                 {product.stock > 0 && (

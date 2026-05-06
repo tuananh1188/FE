@@ -34,7 +34,7 @@ export const CartPage = () => {
           <div className="w-full lg:flex-1">
             <div className="space-y-0">
               {cartItems.map((item) => (
-                <CartItemCard key={item.product._id} item={item} />
+                <CartItemCard key={item._id} item={item} />
               ))}
             </div>
             

@@ -9,13 +9,13 @@ interface CartItemCardProps {
 
 export const CartItemCard = ({ item }: CartItemCardProps) => {
   const { updateQuantity, removeFromCart } = useCart();
-  const { product, quantity } = item;
+  const { product, quantity, size, color, _id: itemId } = item;
   const price = product.price || product.originalPrice;
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleConfirmRemove = async () => {
     setShowConfirm(false);
-    await removeFromCart(product._id);
+    await removeFromCart(itemId);
   };
 
   return (
@@ -37,9 +37,27 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
       {/* Product Info */}
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-1">
-          <h3 className="font-bold text-gray-900 text-sm md:text-base truncate">
-            {product.name}
-          </h3>
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm md:text-base truncate">
+              {product.name}
+            </h3>
+            
+            {/* Display Variants (Size & Color) */}
+            {(size || color) && (
+              <div className="flex gap-2 mt-1">
+                {size && (
+                  <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded uppercase">
+                    Size: {size}
+                  </span>
+                )}
+                {color && (
+                  <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded uppercase">
+                    Màu: {color}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Delete button with inline confirm */}
           {!showConfirm ? (
@@ -70,7 +88,7 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
             </div>
           )}
         </div>
-        <p className="text-xs text-gray-500 mb-4 capitalize">
+        <p className="text-[11px] text-gray-500 mb-4 capitalize">
           {product.category?.name || 'Category'} | In Stock: {product.stock}
         </p>
 
@@ -78,7 +96,7 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
         <div className="flex items-center justify-between mt-auto">
           <div className="flex items-center gap-0 border border-gray-200 rounded-lg overflow-hidden bg-gray-50/50">
             <button
-              onClick={() => updateQuantity(product._id, quantity - 1)}
+              onClick={() => updateQuantity(itemId, quantity - 1)}
               disabled={quantity <= 1}
               className="px-2.5 py-1.5 text-[#C83B1E] hover:bg-gray-100 disabled:opacity-50 disabled:text-gray-400 transition-colors cursor-pointer"
             >
@@ -88,7 +106,7 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
               {quantity}
             </span>
             <button
-              onClick={() => updateQuantity(product._id, quantity + 1)}
+              onClick={() => updateQuantity(itemId, quantity + 1)}
               disabled={quantity >= product.stock}
               className="px-2.5 py-1.5 text-[#C83B1E] hover:bg-gray-100 disabled:opacity-50 disabled:text-gray-400 transition-colors cursor-pointer"
             >

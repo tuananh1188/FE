@@ -8,6 +8,8 @@ export type ProductPayload = {
     discount?: number;
     category: string; // This remains string as we send the ID to the backend
     images: string[];
+    sizes: string[];
+    colors: string[];
     stock: number;
 }
 
@@ -21,6 +23,8 @@ export type Product = {
     discount: number;
     category: Category; // Updated to Category object
     images: string[];
+    sizes: string[];
+    colors: string[];
     stock: number;
     rating: number;
     soldPercentage: number;
@@ -38,11 +42,15 @@ export const productApi = {
     getById: (id: string) =>
         http.get<{ success: boolean; data: Product }>(`product/${id}`),
 
-    create: (payload: ProductPayload) =>
-        http.post<{ success: boolean; data: Product }>('product', payload),
+    create: (payload: FormData) =>
+        http.post<{ success: boolean; data: Product }>('product', payload, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }),
 
-    update: (id: string, payload: Partial<ProductPayload>) =>
-        http.put<{ success: boolean; data: Product }>(`product/${id}`, payload),
+    update: (id: string, payload: FormData) =>
+        http.put<{ success: boolean; data: Product }>(`product/${id}`, payload, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        }),
 
     delete: (id: string) =>
         http.delete<{ success: boolean }>(`product/${id}`),

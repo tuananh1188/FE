@@ -7,13 +7,16 @@ import { toast } from 'sonner';
 export type CartItem = {
   product: Product;
   quantity: number;
+  size?: string;
+  color?: string;
+  _id: string; // Item ID in the cart
 };
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity?: number) => Promise<void>;
-  removeFromCart: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, quantity: number) => Promise<void>;
+  addToCart: (product: Product, quantity?: number, size?: string, color?: string) => Promise<void>;
+  removeFromCart: (itemId: string) => Promise<void>;
+  updateQuantity: (itemId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   cartTotalCount: number;
   cartSubtotal: number;
@@ -31,6 +34,9 @@ const normalizeCartItems = (apiItems: any[]): CartItem[] => {
     .map((item: any) => ({
       product: item.product as Product,
       quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+      _id: item._id,
     }));
 };
 
@@ -97,10 +103,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [cartItems, isLoggedIn]);
 
-  const addToCart = async (product: Product, quantity = 1) => {
+  const addToCart = async (product: Product, quantity = 1, size?: string, color?: string) => {
     if (isLoggedIn) {
       try {
-        const res = await cartApi.addToCart(product._id, quantity);
+        const res = await cartApi.addToCart(product._id, quantity, size, color);
         if (res.data.success && res.data.data) {
           const normalized = normalizeCartItems(res.data.data.items);
           setCartItems(normalized);
@@ -111,69 +117,77 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
     } else {
       setCartItems((prev) => {
-        const existing = prev.find((item) => item.product._id === product._id);
+        // For guest, we use productId + size + color as unique key
+        const existing = prev.find(
+          (item) => 
+            item.product._id === product._id && 
+            item.size === size && 
+            item.color === color
+        );
+        
         if (existing) {
           return prev.map((item) =>
-            item.product._id === product._id
+            (item.product._id === product._id && item.size === size && item.color === color)
               ? { ...item, quantity: item.quantity + quantity }
               : item
           );
         }
-        return [...prev, { product, quantity }];
+        return [...prev, { 
+          product, 
+          quantity, 
+          size, 
+          color, 
+          _id: `temp-${Date.now()}` // Temporary ID for guest
+        }];
       });
     }
   };
 
-  const removeFromCart = async (productId: string) => {
+  const removeFromCart = async (itemId: string) => {
     if (isLoggedIn) {
-      // Optimistic update: remove from UI immediately
       const previousItems = [...cartItems];
-      setCartItems((prev) => prev.filter((item) => item.product._id !== productId));
+      setCartItems((prev) => prev.filter((item) => item._id !== itemId));
 
       try {
-        const res = await cartApi.removeCartItem(productId);
+        const res = await cartApi.removeCartItem(itemId);
         if (res.data.success && res.data.data) {
-          // Sync with server response
           const normalized = normalizeCartItems(res.data.data.items);
           setCartItems(normalized);
         }
       } catch (error: any) {
-        // Rollback on error
         setCartItems(previousItems);
         toast.error('Failed to remove item');
       }
     } else {
-      setCartItems((prev) => prev.filter((item) => item.product._id !== productId));
+      setCartItems((prev) => prev.filter((item) => item._id !== itemId));
     }
   };
 
-  const updateQuantity = async (productId: string, quantity: number) => {
+  const updateQuantity = async (itemId: string, quantity: number) => {
     const safeQuantity = Math.max(1, quantity);
 
     if (isLoggedIn) {
-      // Optimistic update
       const previousItems = [...cartItems];
       setCartItems((prev) =>
         prev.map((item) =>
-          item.product._id === productId ? { ...item, quantity: safeQuantity } : item
+          item._id === itemId ? { ...item, quantity: safeQuantity } : item
         )
       );
 
       try {
-        const res = await cartApi.updateQuantity(productId, safeQuantity);
+        const res = await cartApi.updateQuantity(itemId, safeQuantity);
         if (res.data.success && res.data.data) {
           const normalized = normalizeCartItems(res.data.data.items);
           setCartItems(normalized);
         }
       } catch (error: any) {
-        // Rollback on error
         setCartItems(previousItems);
         toast.error('Failed to update quantity');
       }
     } else {
       setCartItems((prev) =>
         prev.map((item) =>
-          item.product._id === productId ? { ...item, quantity: safeQuantity } : item
+          item._id === itemId ? { ...item, quantity: safeQuantity } : item
         )
       );
     }

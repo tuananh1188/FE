@@ -13,9 +13,9 @@ export const AuthLayout = () => {
       </div>
 
       <main className="flex-grow flex items-center justify-center p-4 md:p-12">
-        <div className="w-full max-w-[1000px] overflow-hidden rounded-[24px] bg-white shadow-2xl flex flex-col md:flex-row min-h-[650px]">
+        <div className="w-full max-w-[1000px] overflow-hidden rounded-[24px] bg-white shadow-2xl flex flex-col md:flex-row md:min-h-[650px]">
           {/* CỘT TRÁI: Hình ảnh và Nội dung thương hiệu */}
-          <section className="relative w-full md:w-1/2 p-12 flex flex-col justify-between text-white overflow-hidden bg-black">
+          <section className="relative w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-between text-white overflow-hidden bg-black min-h-[300px] md:min-h-full">
             {/* Background Image với lớp phủ tối */}
             <div className="absolute inset-0 z-0">
               <img
@@ -27,16 +27,16 @@ export const AuthLayout = () => {
             </div>
 
             <div className="relative z-10">
-              <span className="text-sm font-semibold tracking-tight uppercase">
+              <span className="text-xs md:text-sm font-semibold tracking-tight uppercase">
                 The Editorial Marketplace
               </span>
             </div>
 
             <div className="relative z-10 space-y-4">
-              <h1 className="text-4xl md:text-5xl font-medium leading-tight">
+              <h1 className="text-3xl md:text-5xl font-medium leading-tight">
                 Curating the world's finest for your everyday.
               </h1>
-              <p className="text-lg opacity-80 font-light max-w-sm">
+              <p className="text-base md:text-lg opacity-80 font-light max-w-sm">
                 Join a community of connoisseurs and discover objects that tell
                 a story.
               </p>
@@ -45,8 +45,8 @@ export const AuthLayout = () => {
 
           {/* CỘT PHẢI: Form (Outlet sẽ render Register/Login ở đây) */}
           <section className="w-full md:w-1/2 bg-white p-8 md:p-16 flex flex-col justify-center">
-            {/* Thanh điều hướng tab (Optional - xóa nếu muốn giống 100% ảnh) */}
-            <nav className="mb-8 flex space-x-6 border-b border-gray-100 pb-2">
+            {/* Thanh điều hướng tab */}
+            <nav className="mb-8 flex gap-6 border-b border-gray-100 pb-2">
               <Link
                 to="/register"
                 className={cn(

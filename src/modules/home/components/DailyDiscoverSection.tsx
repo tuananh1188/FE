@@ -20,8 +20,8 @@ export const DailyDiscoverSection = () => {
         const response = await productApi.getAll();
 
         if (response.data.success) {
-          // Filter out Flash Sale products
-          const filtered = response.data.data.filter(p => p.category?.slug !== 'flash-sale');
+          // Chỉ lấy các sản phẩm không có discount (discount = 0 hoặc không có)
+          const filtered = response.data.data.filter(p => !p.discount || p.discount === 0);
           setProducts(filtered);
         }
       } catch (error: any) {
