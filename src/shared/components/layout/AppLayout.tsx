@@ -55,10 +55,18 @@ export const AppLayout = () => {
           </Link>
 
           {/* Search Bar */}
-          <div className="hidden md:block flex-1 max-w-md relative">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const search = formData.get('search');
+              if (search) navigate(`/categories?search=${search}`);
+            }}
+            className="hidden md:block flex-1 max-w-md relative"
+          >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Search curated collections..." />
-          </div>
+            <Input name="search" className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Search curated collections..." />
+          </form>
 
           {/* Home Link */}
           <Link

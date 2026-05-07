@@ -69,6 +69,8 @@ export const FlashSaleSection = () => {
             originalPrice={item.originalPrice}
             discount={item.discount}
             soldPercentage={item.soldPercentage}
+            totalSold={item.totalSold}
+            showBuyButton
             onClick={() => setSelectedProductId(item._id)}
           />
         ))}

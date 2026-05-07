@@ -2,9 +2,19 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { Button } from "@/shared/components/ui/button";
 import type { ProductCardProps } from "../types/product.types";
 import { useState, useEffect } from "react";
+import { Heart } from "lucide-react";
+import { useFavorite } from "@/shared/context/FavoriteContext";
 
+export function ProductCard({ id, name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now", onClick }: ProductCardProps) {
+    const { isFavorite, toggleFavorite } = useFavorite();
+    const isLiked = id ? isFavorite(id) : false;
 
-export function ProductCard({ name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now", onClick }: ProductCardProps) {
+    const handleToggleFavorite = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (id) {
+            toggleFavorite(id);
+        }
+    };
     const primaryImage = images?.[0] || '/products/electronics.png';
     const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png'); // Start with local placeholder
 
@@ -29,6 +39,12 @@ export function ProductCard({ name, images, price, originalPrice, discount, sold
         <Card className="border-none shadow-sm p-3 overflow-hidden group cursor-pointer transition-all hover:shadow-md" onClick={onClick}>
             <div className="relative aspect-square bg-gray-100">
                 {(discount ?? 0) > 0 && <span className="absolute top-2 left-2 bg-[#C83B1E] text-white text-[10px] font-bold px-1.5 py-0.5 rounded z-10">-{discount}%</span>}
+                <button 
+                    onClick={handleToggleFavorite}
+                    className="absolute top-2 right-2 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-400 hover:text-red-500 transition-colors shadow-sm cursor-pointer"
+                >
+                    <Heart className={`size-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                </button>
                 <img 
                     src={displayImage} 
                     alt={name} 

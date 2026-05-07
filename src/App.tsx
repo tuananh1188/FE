@@ -12,16 +12,19 @@ import DashboardPage from './modules/dashboard/DashboardPage';
 import DashboardLayout from './modules/dashboard/components/DashboardLayout';
 import AdminProductsPage from './modules/dashboard/AdminProductsPage';
 import AdminCategoriesPage from './modules/dashboard/AdminCategoriesPage';
+import AdminVouchersPage from './modules/dashboard/AdminVouchersPage';
 import { AdminUsersPage } from './modules/dashboard/AdminUsersPage';
 import { AdminOrdersPage } from './modules/dashboard/AdminOrdersPage';
 import ProductPage from './modules/products/ProductPage';
 import { CartProvider } from '@/shared/context/CartContext';
+import { FavoriteProvider } from '@/shared/context/FavoriteContext';
 import { CartPage } from '@/modules/cart/pages/CartPage';
 import { CheckoutPage } from '@/modules/cart/pages/CheckoutPage';
 
 function App() {
   return (
-    <CartProvider>
+    <FavoriteProvider>
+      <CartProvider>
       <Routes>
         {/* Auth routes */}
         <Route element={<AuthLayout />}>
@@ -36,6 +39,7 @@ function App() {
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<AdminProductsPage />} />
         <Route path="categories" element={<AdminCategoriesPage />} />
+        <Route path="vouchers" element={<AdminVouchersPage />} />
         <Route path="users" element={<AdminUsersPage />} />
         <Route path="orders" element={<AdminOrdersPage />} />
       </Route>
@@ -55,7 +59,8 @@ function App() {
 
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
-    </CartProvider>
+      </CartProvider>
+    </FavoriteProvider>
   );
 }
 

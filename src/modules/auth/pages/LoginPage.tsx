@@ -137,7 +137,7 @@ export const LoginPage = () => {
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="email" className="pl-9" placeholder="name@example.com" {...register('email')} />
+              <Input id="email" className="pl-9" placeholder="name@example.com" autoComplete="email" {...register('email')} />
             </div>
             {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
           </div>
@@ -146,7 +146,7 @@ export const LoginPage = () => {
             <Label htmlFor="password">Password</Label>
             <div className="relative">
               <KeyRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="password" className="pl-9" type="password" placeholder="Enter your password" {...register('password')} />
+              <Input id="password" className="pl-9" type="password" placeholder="Enter your password" autoComplete="current-password" {...register('password')} />
             </div>
             {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
           </div>

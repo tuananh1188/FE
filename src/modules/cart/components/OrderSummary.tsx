@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '@/shared/context/CartContext';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { ArrowRight, CreditCard, Wallet, Banknote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { tokenStore } from '@/modules/auth/store/token.store';
@@ -9,7 +8,6 @@ import { toast } from 'sonner';
 
 export const OrderSummary = () => {
   const { cartSubtotal, cartItems } = useCart();
-  const [promoCode, setPromoCode] = useState('');
   const navigate = useNavigate();
   
   const shipping = cartItems.length > 0 ? 0 : 0;
@@ -44,23 +42,6 @@ export const OrderSummary = () => {
         <div className="flex justify-between items-center text-gray-600">
           <span>Tax</span>
           <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-200 pt-6 mb-6">
-        <label className="block text-xs font-bold text-gray-700 tracking-wider uppercase mb-2">
-          Promo Code
-        </label>
-        <div className="flex gap-2">
-          <Input 
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-            placeholder="Enter code" 
-            className="bg-white border-gray-200 shadow-sm"
-          />
-          <Button variant="outline" className="text-[#C83B1E] border-[#C83B1E] hover:bg-red-50 bg-white cursor-pointer">
-            Apply
-          </Button>
         </div>
       </div>
 

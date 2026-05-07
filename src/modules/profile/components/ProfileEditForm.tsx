@@ -12,6 +12,8 @@ const schema = z.object({
   displayName: z.string().max(60, 'Max 60 characters').optional(),
   bio: z.string().max(200, 'Max 200 characters').optional(),
   phone: z.string().max(20, 'Max 20 characters').optional(),
+  address: z.string().max(200, 'Max 200 characters').optional(),
+  city: z.string().max(100, 'Max 100 characters').optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -85,6 +87,31 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
         {errors.phone && (
           <p className="text-xs text-destructive">{errors.phone.message}</p>
         )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="address">Address</Label>
+          <Input
+            id="address"
+            placeholder="123 Street Name"
+            {...register('address')}
+          />
+          {errors.address && (
+            <p className="text-xs text-destructive">{errors.address.message}</p>
+          )}
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            placeholder="New York"
+            {...register('city')}
+          />
+          {errors.city && (
+            <p className="text-xs text-destructive">{errors.city.message}</p>
+          )}
+        </div>
       </div>
 
       <Button type="submit" className="w-full" disabled={saving}>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { X, Star, Minus, Plus, ShoppingCart, Zap, Truck, RotateCcw, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { X, Star, Minus, Plus, ShoppingCart, Zap, Truck, RotateCcw, Shield, ChevronLeft, ChevronRight, Heart } from 'lucide-react';
 import type { Product } from '@/modules/dashboard/api/product.api';
 import { productApi } from '@/modules/dashboard/api/product.api';
 import { useCart } from '@/shared/context/CartContext';
+import { useFavorite } from '@/shared/context/FavoriteContext';
 import { toast } from 'sonner';
 import { ReviewSection } from './ReviewSection';
 
@@ -22,7 +24,17 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const [localRating, setLocalRating] = useState(0);
     const [localReviewCount, setLocalReviewCount] = useState(0);
     const { addToCart } = useCart();
+    const { isFavorite, toggleFavorite } = useFavorite();
+    const navigate = useNavigate();
     const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png');
+
+    const isLiked = productId ? isFavorite(productId) : false;
+
+    const handleToggleFavorite = () => {
+        if (productId) {
+            toggleFavorite(productId);
+        }
+    };
 
     useEffect(() => {
         if (!productId) {
@@ -106,7 +118,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const hasDiscount = product && product.discount > 0 && product.price < product.originalPrice;
     const categoryName = product?.category?.name ?? 'Uncategorized';
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!product) return;
 
         if (product.sizes && product.sizes.length > 0 && !selectedSize) {
@@ -118,9 +130,13 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
             return;
         }
 
-        addToCart(product, quantity, selectedSize, selectedColor);
-        toast.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`);
-        onClose();
+        try {
+            await addToCart(product, quantity, selectedSize, selectedColor);
+            toast.success(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`);
+            onClose();
+        } catch (err) {
+            // Error handled by context
+        }
     };
 
     const handleBuyNow = async () => {
@@ -395,6 +411,16 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                     >
                                         <Zap size={16} />
                                         Buy Now
+                                    </button>
+                                    <button
+                                        onClick={handleToggleFavorite}
+                                        className={`px-4 py-3.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center ${
+                                            isLiked 
+                                                ? 'border-red-500 bg-red-50 text-red-500' 
+                                                : 'border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-400'
+                                        }`}
+                                    >
+                                        <Heart size={20} className={isLiked ? 'fill-red-500' : ''} />
                                     </button>
                                 </div>
 

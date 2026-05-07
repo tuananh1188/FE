@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/shared/context/CartContext';
 import { orderApi } from '@/shared/api/order.api';
 import { authApi } from '@/modules/auth/api/auth.api';
+import { voucherApi } from '@/shared/api/voucher.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
@@ -20,6 +21,8 @@ import {
   Package,
   Loader2,
   CheckCircle2,
+  Tag,
+  Ticket,
 } from 'lucide-react';
 
 export const CheckoutPage = () => {
@@ -33,15 +36,49 @@ export const CheckoutPage = () => {
     city: '',
     notes: '',
   });
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'CREDIT_CARD'>('COD');
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'CREDIT_CARD' | 'BANK_TRANSFER'>('COD');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Voucher states
+  const [voucherCode, setVoucherCode] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
+  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
+  const [discount, setDiscount] = useState(0);
+
   const shipping = 0;
   const taxRate = 0.08;
   const tax = cartSubtotal * taxRate;
-  const total = cartSubtotal + shipping + tax;
+  const totalBeforeVoucher = cartSubtotal + shipping + tax;
+  const total = Math.max(0, totalBeforeVoucher - discount);
+
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) return;
+    
+    try {
+      setIsValidatingVoucher(true);
+      const res = await voucherApi.validate(voucherCode, totalBeforeVoucher);
+      if (res.data.success) {
+        setAppliedVoucher(res.data.voucher);
+        setDiscount(res.data.discount);
+        toast.success(`Coupon applied: -$${res.data.discount.toFixed(2)}`);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Invalid voucher code');
+      setAppliedVoucher(null);
+      setDiscount(0);
+    } finally {
+      setIsValidatingVoucher(false);
+    }
+  };
+
+  const handleRemoveVoucher = () => {
+    setAppliedVoucher(null);
+    setDiscount(0);
+    setVoucherCode('');
+    toast.info('Voucher removed');
+  };
 
   React.useEffect(() => {
     const fetchProfile = async () => {
@@ -49,11 +86,13 @@ export const CheckoutPage = () => {
         try {
           const res = await authApi.getMe();
           if (res.data) {
-            setForm((prev) => ({
-              ...prev,
-              fullName: prev.fullName || res.data.displayName || '',
-              phone: prev.phone || res.data.phone || '',
-            }));
+              setForm((prev) => ({
+                ...prev,
+                fullName: prev.fullName || res.data.displayName || '',
+                phone: prev.phone || res.data.phone || '',
+                address: prev.address || res.data.address || '',
+                city: prev.city || res.data.city || '',
+              }));
           }
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
@@ -102,6 +141,7 @@ export const CheckoutPage = () => {
           notes: form.notes || undefined,
         },
         paymentMethod,
+        promoCode: appliedVoucher?.code || undefined,
       };
 
       const res = await orderApi.checkout(payload);
@@ -177,6 +217,26 @@ export const CheckoutPage = () => {
               </span>
             </div>
           </div>
+
+          {orderSuccess.paymentMethod === 'BANK_TRANSFER' && (
+            <div className="mb-8 p-6 bg-orange-50 rounded-2xl border-2 border-dashed border-orange-200">
+              <h3 className="text-sm font-bold text-orange-800 uppercase tracking-widest mb-4">
+                Quét mã để thanh toán (VietQR)
+              </h3>
+              <div className="bg-white p-4 rounded-xl shadow-inner inline-block mb-4">
+                <img 
+                  src={`https://img.vietqr.io/image/VPB-99422629-compact2.png?amount=${Math.round(orderSuccess.totalAmount * 25400)}&addInfo=${encodeURIComponent(`THANH TOAN DON HANG ${orderSuccess._id.slice(-8).toUpperCase()}`)}&accountName=QUAN TRI VIEN`}
+                  alt="VietQR Payment"
+                  className="w-64 h-64 mx-auto"
+                />
+              </div>
+              <div className="text-left space-y-1">
+                <p className="text-xs text-orange-700"><strong>Số tiền:</strong> {(orderSuccess.totalAmount * 25400).toLocaleString()} VND</p>
+                <p className="text-xs text-orange-700"><strong>Nội dung:</strong> THANH TOAN DON HANG {orderSuccess._id.slice(-8).toUpperCase()}</p>
+                <p className="text-[10px] text-orange-600 mt-2 italic">* Đơn hàng sẽ được xử lý ngay sau khi nhận được thanh toán.</p>
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3">
             <Button
@@ -404,6 +464,37 @@ export const CheckoutPage = () => {
                     <p className="text-xs text-gray-500">Visa, Mastercard, JCB</p>
                   </div>
                 </label>
+
+                <label
+                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    paymentMethod === 'BANK_TRANSFER'
+                      ? 'border-[#FF6B00] bg-orange-50/50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="BANK_TRANSFER"
+                    checked={paymentMethod === 'BANK_TRANSFER'}
+                    onChange={() => setPaymentMethod('BANK_TRANSFER')}
+                    className="sr-only"
+                  />
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'BANK_TRANSFER' ? 'border-[#FF6B00]' : 'border-gray-300'
+                    }`}
+                  >
+                    {paymentMethod === 'BANK_TRANSFER' && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
+                    )}
+                  </div>
+                  <Ticket size={24} className="text-orange-600" />
+                  <div>
+                    <p className="font-bold text-gray-800 text-sm">Chuyển khoản Ngân hàng (VietQR)</p>
+                    <p className="text-xs text-gray-500">Tạo mã QR thanh toán tự động</p>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
@@ -467,6 +558,50 @@ export const CheckoutPage = () => {
                 <div className="flex justify-between text-gray-600">
                   <span>Tax (8%)</span>
                   <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
+                </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-[#C83B1E] font-medium bg-red-50 p-2 rounded-lg">
+                    <span className="flex items-center gap-1">
+                      <Tag size={14} />
+                      Voucher ({appliedVoucher?.code})
+                    </span>
+                    <span>-${discount.toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Voucher Input */}
+              <div className="mt-6 mb-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                    <Input 
+                      placeholder="Promo code" 
+                      value={voucherCode}
+                      onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                      className="pl-10 h-10 bg-gray-50/50 border-gray-200 uppercase"
+                      disabled={!!appliedVoucher}
+                    />
+                  </div>
+                  {appliedVoucher ? (
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      onClick={handleRemoveVoucher}
+                      className="h-10 border-gray-200 text-gray-500 hover:text-red-500 cursor-pointer"
+                    >
+                      Remove
+                    </Button>
+                  ) : (
+                    <Button 
+                      type="button"
+                      onClick={handleApplyVoucher}
+                      disabled={isValidatingVoucher || !voucherCode.trim()}
+                      className="h-10 bg-gray-800 hover:bg-gray-900 text-white px-5 cursor-pointer disabled:opacity-50"
+                    >
+                      {isValidatingVoucher ? <Loader2 size={16} className="animate-spin" /> : 'Apply'}
+                    </Button>
+                  )}
                 </div>
               </div>
 

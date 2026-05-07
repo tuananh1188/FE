@@ -34,9 +34,9 @@ export type Product = {
 }
 
 export const productApi = {
-    getAll: (search?: string, category?: string) =>
+    getAll: (search?: string, category?: string, minPrice?: number, maxPrice?: number, sort?: string) =>
         http.get<{ success: boolean; count: number; data: Product[] }>('product', {
-            params: { search, category },
+            params: { search, category, minPrice, maxPrice, sort },
         }),
 
     getById: (id: string) =>

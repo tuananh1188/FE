@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, ShoppingBag, ShoppingCart, User,
-    BarChart3, Settings, Zap, LogOut, ExternalLink, LayoutGrid
+    BarChart3, Settings, Zap, LogOut, ExternalLink, LayoutGrid, Ticket
 } from 'lucide-react';
 
 const menuItems = [
@@ -9,6 +9,7 @@ const menuItems = [
     { icon: <ShoppingBag size={20} />, label: 'Products', to: '/admin/products' },
     { icon: <LayoutGrid size={20} />, label: 'Categories', to: '/admin/categories' },
     { icon: <ShoppingCart size={20} />, label: 'Orders', to: '/admin/orders' },
+    { icon: <Ticket size={20} />, label: 'Vouchers', to: '/admin/vouchers' },
     { icon: <User size={20} />, label: 'Users', to: '/admin/users' },
     { icon: <BarChart3 size={20} />, label: 'Reports', to: '/admin/reports' },
     { icon: <Settings size={20} />, label: 'Settings', to: '/admin/settings' },
