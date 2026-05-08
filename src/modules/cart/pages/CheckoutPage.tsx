@@ -40,6 +40,8 @@ export const CheckoutPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+
 
   // Voucher states
   const [voucherCode, setVoucherCode] = useState('');
@@ -157,6 +159,24 @@ export const CheckoutPage = () => {
     }
   };
 
+  const handleConfirmPayment = async () => {
+    if (!orderSuccess?._id) return;
+    
+    try {
+      setIsConfirmingPayment(true);
+      const res = await orderApi.confirmPayment(orderSuccess._id);
+      if (res.data.success) {
+        toast.success('Payment confirmed! Your order is being processed.');
+        setOrderSuccess(res.data.data);
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to confirm payment');
+    } finally {
+      setIsConfirmingPayment(false);
+    }
+  };
+
+
   // Redirect if cart is empty and no successful order
   if (cartItems.length === 0 && !orderSuccess) {
     return (
@@ -230,13 +250,34 @@ export const CheckoutPage = () => {
                   className="w-64 h-64 mx-auto"
                 />
               </div>
-              <div className="text-left space-y-1">
+              <div className="text-left space-y-1 mb-6">
                 <p className="text-xs text-orange-700"><strong>Số tiền:</strong> {(orderSuccess.totalAmount * 25400).toLocaleString()} VND</p>
                 <p className="text-xs text-orange-700"><strong>Nội dung:</strong> THANH TOAN DON HANG {orderSuccess._id.slice(-8).toUpperCase()}</p>
                 <p className="text-[10px] text-orange-600 mt-2 italic">* Đơn hàng sẽ được xử lý ngay sau khi nhận được thanh toán.</p>
               </div>
+
+              {orderSuccess.paymentStatus === 'PENDING' ? (
+                <Button
+                  onClick={handleConfirmPayment}
+                  disabled={isConfirmingPayment}
+                  className="w-full bg-[#FF6B00] hover:bg-[#E65A00] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2"
+                >
+                  {isConfirmingPayment ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 size={18} /> Tôi đã thanh toán
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <div className="flex items-center justify-center gap-2 text-green-600 font-bold py-3 bg-green-50 rounded-xl border border-green-200">
+                  <ShieldCheck size={20} /> Đã xác nhận thanh toán
+                </div>
+              )}
             </div>
           )}
+
 
           <div className="flex gap-3">
             <Button

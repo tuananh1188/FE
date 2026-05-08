@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { adminUserApi } from './api/user.api';
 import type { UserResponse } from './api/user.api';
 import { toast } from 'sonner';
-import { Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Loader2, ShieldAlert, ShieldCheck, Lock, Unlock, Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
+
 
 export const AdminUsersPage = () => {
   const [users, setUsers] = useState<UserResponse[]>([]);
@@ -38,6 +39,32 @@ export const AdminUsersPage = () => {
       toast.error(error?.response?.data?.message || 'Failed to update role');
     }
   };
+
+  const handleToggleBlock = async (userId: string) => {
+    try {
+      const res = await adminUserApi.toggleBlockUser(userId);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        setUsers(users.map(u => u._id === userId ? { ...u, isBlocked: !u.isBlocked } : u));
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to toggle block status');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    try {
+      const res = await adminUserApi.deleteUser(userId);
+      if (res.data.success) {
+        toast.success(res.data.message);
+        setUsers(users.filter(u => u._id !== userId));
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to delete user');
+    }
+  };
+
 
   if (loading) {
     return (
@@ -77,9 +104,16 @@ export const AdminUsersPage = () => {
                     {user.phone || 'N/A'}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${user.isEmailVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                      {user.isEmailVerified ? 'Verified' : 'Unverified'}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold w-fit ${user.isEmailVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                        {user.isEmailVerified ? 'Verified' : 'Unverified'}
+                      </span>
+                      {user.isBlocked && (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 w-fit">
+                          Blocked
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`flex items-center gap-1 text-sm font-semibold ${user.role === 'admin' ? 'text-purple-600' : 'text-gray-600'}`}>
@@ -91,14 +125,40 @@ export const AdminUsersPage = () => {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleToggleRole(user._id, user.role)}
-                      className={user.role === 'admin' ? 'text-gray-600 border-gray-200 hover:bg-gray-100' : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
-                    >
-                      {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleToggleRole(user._id, user.role)}
+                        className={user.role === 'admin' ? 'text-gray-600 border-gray-200 hover:bg-gray-100' : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
+                      >
+                        {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+                      </Button>
+                      
+                      {user.role !== 'admin' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleBlock(user._id)}
+                            className={user.isBlocked ? 'text-green-600 border-green-200 hover:bg-green-50' : 'text-orange-600 border-orange-200 hover:bg-orange-50'}
+                            title={user.isBlocked ? 'Unblock user' : 'Block user'}
+                          >
+                            {user.isBlocked ? <Unlock size={16} /> : <Lock size={16} />}
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            title="Delete user"
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

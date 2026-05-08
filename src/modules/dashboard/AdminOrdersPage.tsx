@@ -107,9 +107,16 @@ export const AdminOrdersPage = () => {
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1.5 items-start">
                       <span className="flex items-center gap-1 text-xs font-semibold text-gray-600">
-                        {order.paymentMethod === 'COD' ? <Banknote size={14} className="text-green-600" /> : <CreditCard size={14} className="text-blue-600" />}
-                        {order.paymentMethod}
+                        {order.paymentMethod === 'COD' ? (
+                          <Banknote size={14} className="text-green-600" />
+                        ) : order.paymentMethod === 'BANK_TRANSFER' ? (
+                          <CheckCircle2 size={14} className="text-orange-600" />
+                        ) : (
+                          <CreditCard size={14} className="text-blue-600" />
+                        )}
+                        {order.paymentMethod === 'BANK_TRANSFER' ? 'QR (Bank)' : order.paymentMethod}
                       </span>
+
                       <select 
                         value={order.paymentStatus}
                         onChange={(e) => handleUpdateStatus(order._id, e.target.value, 'paymentStatus')}

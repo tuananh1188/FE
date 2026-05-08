@@ -20,7 +20,7 @@ export type OrderAPIResponse = {
         city?: string;
         notes?: string;
     };
-    paymentMethod: 'COD' | 'CREDIT_CARD';
+    paymentMethod: 'COD' | 'CREDIT_CARD' | 'BANK_TRANSFER';
     paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
     orderStatus: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
     subtotal: number;
@@ -39,7 +39,7 @@ export type CheckoutPayload = {
         city?: string;
         notes?: string;
     };
-    paymentMethod?: 'COD' | 'CREDIT_CARD';
+    paymentMethod?: 'COD' | 'CREDIT_CARD' | 'BANK_TRANSFER';
     promoCode?: string;
 };
 
@@ -60,6 +60,9 @@ export const orderApi = {
     getOrderById: (id: string) =>
         http.get<{ success: boolean; data: OrderAPIResponse }>(`orders/${id}`),
 
+    confirmPayment: (id: string) =>
+        http.patch<{ success: boolean; message: string; data: OrderAPIResponse }>(`orders/${id}/confirm-payment`),
+
     // Admin APIs
     getAllOrders: () =>
         http.get<{ success: boolean; count: number; data: OrderAPIResponse[] }>('orders/all'),
@@ -70,3 +73,4 @@ export const orderApi = {
     getDashboardStats: () =>
         http.get<{ success: boolean; data: DashboardStats }>('orders/stats'),
 };
+

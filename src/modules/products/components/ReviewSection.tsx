@@ -75,7 +75,8 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
-    const [hasReviewed, setHasReviewed] = useState(false);
+    const [hasRated, setHasRated] = useState(false);
+
 
     const isLoggedIn = !!tokenStore.get();
 
@@ -106,16 +107,15 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
         }).catch(() => {});
     }, [isLoggedIn]);
 
-    // Check if current user already reviewed
+    // Check if current user already rated
     useEffect(() => {
         if (!currentUser || reviews.length === 0) return;
-        const found = reviews.find(r => r.user._id === currentUser._id);
-        if (found) {
-            setHasReviewed(true);
-            setMyRating(found.rating);
-            setMyComment(found.comment);
+        const foundRating = reviews.find(r => r.user._id === currentUser._id && r.rating > 0);
+        if (foundRating) {
+            setHasRated(true);
         }
     }, [currentUser, reviews]);
+
 
     // Distribution counts per star
     const distribution = [5, 4, 3, 2, 1].map((star) => ({
@@ -125,17 +125,20 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (myRating === 0) {
-            toast.error('Vui lòng chọn số sao trước khi gửi.');
+        if (myRating === 0 && (!myComment || myComment.trim() === '')) {
+            toast.error('Vui lòng nhập bình luận hoặc chọn số sao.');
             return;
         }
+
         try {
             setSubmitting(true);
             const res = await reviewApi.create({ productId, rating: myRating, comment: myComment });
             if (res.data.success) {
-                toast.success('Cảm ơn bạn đã đánh giá sản phẩm!');
-                setHasReviewed(true);
+                toast.success('Cảm ơn bạn đã gửi ý kiến!');
+                setMyComment('');
+                setMyRating(0);
                 await fetchReviews();
+
                 // Recalculate from updated reviews list
                 const updated = await reviewApi.getByProduct(productId);
                 if (updated.data.success) {
@@ -191,42 +194,46 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
 
             {/* Review Form */}
             {isLoggedIn ? (
-                hasReviewed ? (
-                    <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
-                        <span>✓</span>
-                        <span>Bạn đã đánh giá sản phẩm này. Cảm ơn bạn!</span>
-                    </div>
-                ) : (
                     <form onSubmit={handleSubmit} className="bg-gray-50 rounded-2xl p-5 mb-6">
-                        <p className="text-sm font-semibold text-gray-700 mb-3">Viết đánh giá của bạn</p>
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className="text-sm text-gray-500">Số sao:</span>
-                            <StarRating value={myRating} onChange={setMyRating} size={22} />
-                            {myRating > 0 && (
-                                <span className="text-xs text-amber-500 font-medium">
-                                    {['', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'][myRating]}
-                                </span>
-                            )}
-                        </div>
+                        <p className="text-sm font-semibold text-gray-700 mb-3">Viết bình luận của bạn</p>
+                        
+                        {!hasRated && (
+                            <div className="flex items-center gap-3 mb-4">
+                                <span className="text-sm text-gray-500">Đánh giá sản phẩm:</span>
+                                <StarRating value={myRating} onChange={setMyRating} size={22} />
+                                {myRating > 0 && (
+                                    <span className="text-xs text-amber-500 font-medium">
+                                        {['', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'][myRating]}
+                                    </span>
+                                )}
+                            </div>
+                        )}
+
+                        {hasRated && (
+                            <div className="flex items-center gap-2 text-xs text-green-600 mb-3 italic">
+                                <span>✓ Bạn đã đánh giá sản phẩm này. Bạn có thể gửi thêm nhiều bình luận.</span>
+                            </div>
+                        )}
+
                         <textarea
                             value={myComment}
                             onChange={(e) => setMyComment(e.target.value)}
-                            placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm này... (không bắt buộc)"
+                            placeholder="Chia sẻ thêm trải nghiệm của bạn về sản phẩm này..."
                             rows={3}
                             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C83B1E]/20 focus:border-[#C83B1E] transition-all resize-none bg-white"
                         />
                         <div className="flex justify-end mt-3">
                             <button
                                 type="submit"
-                                disabled={submitting || myRating === 0}
+                                disabled={submitting || (myRating === 0 && !myComment.trim())}
                                 className="flex items-center gap-2 px-5 py-2.5 bg-[#C83B1E] text-white rounded-xl text-sm font-semibold hover:bg-[#b03318] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-[#C83B1E]/20 cursor-pointer"
                             >
                                 {submitting ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                                {submitting ? 'Đang gửi...' : 'Gửi đánh giá'}
+                                {submitting ? 'Đang gửi...' : 'Gửi bình luận'}
                             </button>
                         </div>
                     </form>
-                )
+
             ) : (
                 <div className="flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-6">
                     <AlertCircle size={18} className="text-blue-500 flex-shrink-0" />
