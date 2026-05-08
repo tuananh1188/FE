@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { adminUserApi } from './api/user.api';
 import type { UserResponse } from './api/user.api';
 import { toast } from 'sonner';
-import { Loader2, ShieldAlert, ShieldCheck, Lock, Unlock, Trash2 } from 'lucide-react';
+import { Loader2, ShieldAlert, ShieldCheck, Lock, Unlock, Trash2, User, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 
 
@@ -105,24 +105,30 @@ export const AdminUsersPage = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold w-fit ${user.isEmailVerified ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                        {user.isEmailVerified ? 'Verified' : 'Unverified'}
-                      </span>
-                      {user.isBlocked && (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700 w-fit">
-                          Blocked
+                      {user.isBlocked ? (
+                        <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-red-100 text-red-700 w-fit flex items-center gap-1">
+                          <Lock size={10} /> Blocked
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-green-100 text-green-700 w-fit flex items-center gap-1">
+                          <ShieldCheck size={10} /> Active
+                        </span>
+                      )}
+                      {!user.isEmailVerified && (
+                        <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-yellow-100 text-yellow-700 w-fit">
+                          Unverified
                         </span>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`flex items-center gap-1 text-sm font-semibold ${user.role === 'admin' ? 'text-purple-600' : 'text-gray-600'}`}>
-                      {user.role === 'admin' ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
+                    <span className={`flex items-center gap-1.5 text-sm font-bold ${user.role === 'admin' ? 'text-purple-600' : 'text-gray-600'}`}>
+                      {user.role === 'admin' ? <ShieldCheck size={16} /> : <User size={16} />}
                       {user.role.toUpperCase()}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(user.createdAt).toLocaleDateString()}
+                  <td className="px-6 py-4 text-sm text-gray-500 font-medium">
+                    {new Date(user.createdAt).toLocaleDateString('vi-VN')}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
@@ -130,7 +136,7 @@ export const AdminUsersPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => handleToggleRole(user._id, user.role)}
-                        className={user.role === 'admin' ? 'text-gray-600 border-gray-200 hover:bg-gray-100' : 'text-purple-600 border-purple-200 hover:bg-purple-50'}
+                        className={`h-9 rounded-lg font-bold text-xs border-2 transition-all ${user.role === 'admin' ? 'text-gray-500 border-gray-100 hover:bg-gray-50' : 'text-purple-600 border-purple-100 hover:bg-purple-50 hover:border-purple-200'}`}
                       >
                         {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
                       </Button>
@@ -141,8 +147,8 @@ export const AdminUsersPage = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleToggleBlock(user._id)}
-                            className={user.isBlocked ? 'text-green-600 border-green-200 hover:bg-green-50' : 'text-orange-600 border-orange-200 hover:bg-orange-50'}
-                            title={user.isBlocked ? 'Unblock user' : 'Block user'}
+                            className={`h-9 px-3 rounded-lg font-bold border-2 transition-all ${user.isBlocked ? 'text-green-600 border-green-100 hover:bg-green-50 hover:border-green-200' : 'text-red-500 border-red-50/50 hover:bg-red-50 hover:border-red-100'}`}
+                            title={user.isBlocked ? 'Unlock this user' : 'Block this user'}
                           >
                             {user.isBlocked ? <Unlock size={16} /> : <Lock size={16} />}
                           </Button>
@@ -151,7 +157,7 @@ export const AdminUsersPage = () => {
                             variant="outline"
                             size="sm"
                             onClick={() => handleDeleteUser(user._id)}
-                            className="text-red-600 border-red-200 hover:bg-red-50"
+                            className="h-9 px-3 rounded-lg text-gray-400 border-gray-100 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all border-2"
                             title="Delete user"
                           >
                             <Trash2 size={16} />

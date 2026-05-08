@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Star, MessageSquare, Send, User, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Star, MessageSquare, Send, User, Loader2, AlertCircle, ThumbsUp, CheckCircle2, Image as ImageIcon, X } from 'lucide-react';
 import { reviewApi, type Review } from '../api/review.api';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
@@ -76,6 +76,9 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
     const [myRating, setMyRating] = useState(0);
     const [myComment, setMyComment] = useState('');
     const [hasRated, setHasRated] = useState(false);
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [previews, setPreviews] = useState<string[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
 
     const isLoggedIn = !!tokenStore.get();
@@ -123,6 +126,31 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
         count: reviews.filter((r) => r.rating === star).length,
     }));
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (selectedFiles.length + files.length > 5) {
+            toast.error('Tối đa 5 hình ảnh.');
+            return;
+        }
+
+        const newFiles = [...selectedFiles, ...files];
+        setSelectedFiles(newFiles);
+
+        const newPreviews = files.map(f => URL.createObjectURL(f));
+        setPreviews([...previews, ...newPreviews]);
+    };
+
+    const removeFile = (index: number) => {
+        const newFiles = [...selectedFiles];
+        newFiles.splice(index, 1);
+        setSelectedFiles(newFiles);
+
+        const newPreviews = [...previews];
+        URL.revokeObjectURL(newPreviews[index]);
+        newPreviews.splice(index, 1);
+        setPreviews(newPreviews);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (myRating === 0 && (!myComment || myComment.trim() === '')) {
@@ -132,11 +160,28 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
 
         try {
             setSubmitting(true);
-            const res = await reviewApi.create({ productId, rating: myRating, comment: myComment });
+            
+            let uploadedUrls: string[] = [];
+            if (selectedFiles.length > 0) {
+                const uploadRes = await reviewApi.uploadMedia(selectedFiles);
+                if (uploadRes.data.success) {
+                    uploadedUrls = uploadRes.data.urls;
+                }
+            }
+
+            const res = await reviewApi.create({ 
+                productId, 
+                rating: myRating, 
+                comment: myComment,
+                images: uploadedUrls
+            });
+            
             if (res.data.success) {
                 toast.success('Cảm ơn bạn đã gửi ý kiến!');
                 setMyComment('');
                 setMyRating(0);
+                setSelectedFiles([]);
+                setPreviews([]);
                 await fetchReviews();
 
                 // Recalculate from updated reviews list
@@ -154,6 +199,21 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
             toast.error(msg);
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleToggleHelpful = async (reviewId: string) => {
+        if (!isLoggedIn) {
+            toast.error('Vui lòng đăng nhập để bình chọn.');
+            return;
+        }
+        try {
+            const res = await reviewApi.toggleHelpful(reviewId);
+            if (res.data.success) {
+                setReviews(prev => prev.map(r => r._id === reviewId ? { ...r, helpfulVotes: res.data.data.helpfulVotes } : r));
+            }
+        } catch {
+            toast.error('Không thể thực hiện bình chọn.');
         }
     };
 
@@ -222,7 +282,44 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
                             rows={3}
                             className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#C83B1E]/20 focus:border-[#C83B1E] transition-all resize-none bg-white"
                         />
-                        <div className="flex justify-end mt-3">
+
+                        {/* Image Previews */}
+                        {previews.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                                {previews.map((url, i) => (
+                                    <div key={i} className="relative group">
+                                        <img src={url} alt="preview" className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                                        <button 
+                                            type="button"
+                                            onClick={() => removeFile(i)}
+                                            className="absolute -top-1.5 -right-1.5 bg-gray-900 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="flex justify-between items-center mt-3">
+                            <div>
+                                <input 
+                                    ref={fileInputRef}
+                                    type="file" 
+                                    multiple 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                    onChange={handleFileChange}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-1.5 text-xs font-bold text-gray-500 hover:text-[#C83B1E] transition-colors cursor-pointer"
+                                >
+                                    <ImageIcon size={16} />
+                                    Thêm ảnh ({selectedFiles.length}/5)
+                                </button>
+                            </div>
                             <button
                                 type="submit"
                                 disabled={submitting || (myRating === 0 && !myComment.trim())}
@@ -277,9 +374,16 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
                             <div className="flex-1 bg-gray-50 rounded-xl px-4 py-3">
                                 <div className="flex items-start justify-between gap-2 mb-1">
                                     <div>
-                                        <span className="text-sm font-semibold text-gray-800">
-                                            {review.user.displayName || 'Người dùng ẩn danh'}
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold text-gray-800">
+                                                {review.user.displayName || 'Người dùng ẩn danh'}
+                                            </span>
+                                            {review.isVerifiedPurchase && (
+                                                <span className="flex items-center gap-0.5 text-[10px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full border border-green-100">
+                                                    <CheckCircle2 size={10} /> Đã mua hàng
+                                                </span>
+                                            )}
+                                        </div>
                                         <div className="mt-0.5">
                                             <StarRating value={review.rating} readonly size={12} />
                                         </div>
@@ -291,6 +395,48 @@ export function ReviewSection({ productId, productRating, reviewCount, onRatingU
                                 {review.comment && (
                                     <p className="text-sm text-gray-600 leading-relaxed mt-1">{review.comment}</p>
                                 )}
+
+                                {/* Review Images */}
+                                {review.images && review.images.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {review.images.map((img, i) => (
+                                            <img 
+                                                key={i} 
+                                                src={img} 
+                                                alt="Review" 
+                                                className="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity border border-gray-100" 
+                                                onClick={() => window.open(img, '_blank')}
+                                            />
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Admin Reply */}
+                                {review.adminReply && (
+                                    <div className="mt-3 bg-white/50 rounded-lg p-3 border-l-4 border-[#C83B1E]">
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <span className="text-xs font-bold text-[#C83B1E]">Phản hồi từ người bán</span>
+                                        </div>
+                                        <p className="text-xs text-gray-500 italic leading-relaxed">
+                                            "{review.adminReply}"
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Footer actions */}
+                                <div className="mt-3 flex items-center justify-between">
+                                    <button
+                                        onClick={() => handleToggleHelpful(review._id)}
+                                        className={`flex items-center gap-1.5 text-xs transition-colors cursor-pointer ${
+                                            currentUser && review.helpfulVotes?.includes(currentUser._id)
+                                                ? 'text-[#C83B1E] font-bold'
+                                                : 'text-gray-400 hover:text-gray-600'
+                                        }`}
+                                    >
+                                        <ThumbsUp size={14} className={currentUser && review.helpfulVotes?.includes(currentUser._id) ? 'fill-[#C83B1E]' : ''} />
+                                        Hữu ích {review.helpfulVotes && review.helpfulVotes.length > 0 && `(${review.helpfulVotes.length})`}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}

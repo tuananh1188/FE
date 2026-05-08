@@ -27,18 +27,27 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const { isFavorite, toggleFavorite } = useFavorite();
     const navigate = useNavigate();
     const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png');
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [loadingRelated, setLoadingRelated] = useState(false);
+    const [currentId, setCurrentId] = useState<string | null>(productId);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-    const isLiked = productId ? isFavorite(productId) : false;
+    useEffect(() => {
+        setCurrentId(productId);
+    }, [productId]);
+
+    const isLiked = currentId ? isFavorite(currentId) : false;
 
     const handleToggleFavorite = () => {
-        if (productId) {
-            toggleFavorite(productId);
+        if (currentId) {
+            toggleFavorite(currentId);
         }
     };
 
     useEffect(() => {
-        if (!productId) {
+        if (!currentId) {
             setProduct(null);
+            setRelatedProducts([]);
             return;
         }
 
@@ -48,7 +57,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
             setQuantity(1);
             setImageLoaded(false);
             try {
-                const res = await productApi.getById(productId);
+                const res = await productApi.getById(currentId);
                 if (res.data.success) {
                     setProduct(res.data.data);
                     setLocalRating(res.data.data.rating ?? 0);
@@ -57,15 +66,24 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                     // Reset selections when product changes
                     setSelectedSize('');
                     setSelectedColor('');
+                    setIsDescriptionExpanded(false);
+
+                    // Fetch related products
+                    setLoadingRelated(true);
+                    const relatedRes = await productApi.getRelatedProducts(currentId);
+                    if (relatedRes.data.success) {
+                        setRelatedProducts(relatedRes.data.data);
+                    }
                 }
             } catch (err) {
                 console.error('Failed to load product details:', err);
             } finally {
                 setLoading(false);
+                setLoadingRelated(false);
             }
         };
         fetchProduct();
-    }, [productId]);
+    }, [currentId]);
 
     useEffect(() => {
         if (product && product.images[selectedImageIndex]) {
@@ -90,7 +108,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
         }
     }, [product, selectedImageIndex]);
 
-    if (!productId) return null;
+    if (!currentId) return null;
 
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) onClose();
@@ -152,7 +170,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
 
         try {
             await addToCart(product, quantity, selectedSize, selectedColor);
-            navigate('/cart');
+            navigate('/checkout');
             onClose();
         } catch (err) {
             // Error handled by context
@@ -306,9 +324,19 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                 </div>
 
                                 {/* Description */}
-                                <p className="text-sm text-gray-600 leading-relaxed mb-6">
-                                    {product.description}
-                                </p>
+                                <div className="mb-6">
+                                    <p className={`text-sm text-gray-600 leading-relaxed transition-all duration-300 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}>
+                                        {product.description}
+                                    </p>
+                                    {product.description.length > 150 && (
+                                        <button
+                                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                                            className="text-[#C83B1E] text-xs font-bold mt-1 hover:underline cursor-pointer flex items-center gap-1"
+                                        >
+                                            {isDescriptionExpanded ? 'Thu gọn' : 'Xem thêm'}
+                                        </button>
+                                    )}
+                                </div>
 
                                 {/* Stock status */}
                                 <div className="flex items-center gap-2 mb-5">
@@ -329,10 +357,10 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                                 <button
                                                     key={size}
                                                     onClick={() => setSelectedSize(size)}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer ${
+                                                    className={`min-w-[48px] h-10 px-3 text-sm font-bold rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                                                         selectedSize === size
-                                                            ? 'border-[#C83B1E] bg-red-50 text-[#C83B1E]'
-                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                            ? 'border-[#C83B1E] bg-[#C83B1E] text-white shadow-md shadow-[#C83B1E]/20'
+                                                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 hover:bg-white'
                                                     }`}
                                                 >
                                                     {size}
@@ -353,10 +381,10 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                                 <button
                                                     key={color}
                                                     onClick={() => setSelectedColor(color)}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all cursor-pointer ${
+                                                    className={`h-10 px-5 text-sm font-bold rounded-xl border-2 transition-all duration-200 cursor-pointer ${
                                                         selectedColor === color
-                                                            ? 'border-[#C83B1E] bg-red-50 text-[#C83B1E]'
-                                                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                                                            ? 'border-[#C83B1E] bg-[#C83B1E] text-white shadow-md shadow-[#C83B1E]/20'
+                                                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 hover:bg-white'
                                                     }`}
                                                 >
                                                     {color}
@@ -372,55 +400,55 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
                                             Quantity
                                         </label>
-                                        <div className="flex items-center gap-0 border border-gray-200 rounded-xl w-fit overflow-hidden">
+                                        <div className="flex items-center gap-0 border-2 border-gray-100 rounded-xl w-fit overflow-hidden bg-gray-50">
                                             <button
                                                 onClick={decrementQty}
                                                 disabled={quantity <= 1}
-                                                className="px-3.5 py-2.5 text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                                className="px-4 py-2.5 text-gray-500 hover:bg-white hover:text-[#C83B1E] disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed"
                                             >
-                                                <Minus size={16} />
+                                                <Minus size={18} />
                                             </button>
-                                            <span className="px-5 py-2.5 text-sm font-bold text-gray-800 min-w-[48px] text-center border-x border-gray-200">
+                                            <span className="px-6 py-2.5 text-base font-black text-gray-800 min-w-[56px] text-center border-x-2 border-gray-100 bg-white">
                                                 {quantity}
                                             </span>
                                             <button
                                                 onClick={incrementQty}
                                                 disabled={quantity >= product.stock}
-                                                className="px-3.5 py-2.5 text-gray-500 hover:bg-gray-50 disabled:opacity-30 transition-colors cursor-pointer disabled:cursor-not-allowed"
+                                                className="px-4 py-2.5 text-gray-500 hover:bg-white hover:text-[#C83B1E] disabled:opacity-30 transition-all cursor-pointer disabled:cursor-not-allowed"
                                             >
-                                                <Plus size={16} />
+                                                <Plus size={18} />
                                             </button>
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Action buttons */}
-                                <div className="flex gap-3 mb-6">
+                                <div className="grid grid-cols-5 gap-3 mb-6">
                                     <button
                                         onClick={handleAddToCart}
                                         disabled={product.stock <= 0}
-                                        className="flex-1 flex items-center justify-center gap-2 bg-[#C83B1E] text-white py-3.5 rounded-xl font-semibold text-sm hover:bg-[#b03318] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-[#C83B1E]/20 hover:shadow-[#C83B1E]/30"
+                                        className="col-span-2 flex items-center justify-center gap-2 bg-[#C83B1E] text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider hover:bg-[#b03318] hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-[#C83B1E]/25 hover:shadow-[#C83B1E]/40"
                                     >
                                         <ShoppingCart size={18} />
-                                        Add to Cart
+                                        Cart
                                     </button>
                                     <button
                                         onClick={handleBuyNow}
                                         disabled={product.stock <= 0}
-                                        className="px-6 py-3.5 rounded-xl font-semibold text-sm border-2 border-gray-800 text-gray-800 hover:bg-gray-800 hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                                        className="col-span-2 flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider hover:bg-black hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-gray-900/20 hover:shadow-gray-900/30"
                                     >
-                                        <Zap size={16} />
+                                        <Zap size={18} className="text-amber-400 fill-amber-400" />
                                         Buy Now
                                     </button>
                                     <button
                                         onClick={handleToggleFavorite}
-                                        className={`px-4 py-3.5 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-center ${
+                                        className={`col-span-1 flex items-center justify-center rounded-2xl border-2 transition-all duration-300 cursor-pointer ${
                                             isLiked 
-                                                ? 'border-red-500 bg-red-50 text-red-500' 
-                                                : 'border-gray-200 text-gray-400 hover:border-red-200 hover:text-red-400'
+                                                ? 'border-red-500 bg-red-50 text-red-500 shadow-md shadow-red-500/10' 
+                                                : 'border-gray-100 bg-gray-50 text-gray-400 hover:border-red-200 hover:text-red-400 hover:bg-white'
                                         }`}
                                     >
-                                        <Heart size={20} className={isLiked ? 'fill-red-500' : ''} />
+                                        <Heart size={22} className={isLiked ? 'fill-red-500' : ''} />
                                     </button>
                                 </div>
 
@@ -449,6 +477,51 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Related Products Section */}
+                            {relatedProducts.length > 0 && (
+                                <div className="px-6 py-6 border-t border-gray-100 bg-gray-50/10">
+                                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">
+                                        Sản phẩm liên quan
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {relatedProducts.map((p) => (
+                                            <button
+                                                key={p._id}
+                                                onClick={() => {
+                                                    setCurrentId(p._id);
+                                                    document.querySelector('.max-h-\\[90vh\\]')?.scrollTo({ top: 0, behavior: 'smooth' });
+                                                }}
+                                                className="w-full flex items-center gap-4 p-2 rounded-xl hover:bg-white hover:shadow-sm transition-all group cursor-pointer border border-transparent hover:border-gray-100"
+                                            >
+                                                <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                                                    <img
+                                                        src={p.images[0] || '/products/electronics.png'}
+                                                        alt={p.name}
+                                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 text-left">
+                                                    <h4 className="text-sm font-bold text-gray-800 line-clamp-1 mb-0.5 group-hover:text-[#C83B1E] transition-colors">
+                                                        {p.name}
+                                                    </h4>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-black text-[#C83B1E]">
+                                                            ${p.price.toFixed(2)}
+                                                        </span>
+                                                        <span className="text-[10px] text-gray-400 font-medium bg-gray-100 px-1.5 py-0.5 rounded">
+                                                            {p.category?.name}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity pr-2">
+                                                    <ChevronRight size={16} className="text-gray-300" />
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </>
                 ) : (
@@ -480,6 +553,13 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                 @keyframes slideUp {
                     from { opacity: 0; transform: translateY(20px) scale(0.98); }
                     to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                .no-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .no-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
                 }
             `}</style>
         </div>

@@ -29,7 +29,7 @@ export const AppLayout = () => {
       }
     }
     authApi.getMe()
-      .then((res) => setUser(res.data as CurrentUser))
+      .then((res) => setUser(res.data.data as CurrentUser))
       .catch(() => {
         tokenStore.clear();
         navigate('/login');

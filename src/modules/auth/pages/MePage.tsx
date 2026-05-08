@@ -13,7 +13,7 @@ export const MePage = () => {
     const run = async () => {
       try {
         const response = await authApi.getMe();
-        setUser(response.data as CurrentUser);
+        setUser(response.data.data as CurrentUser);
         setMessage('');
       } catch {
         tokenStore.clear();

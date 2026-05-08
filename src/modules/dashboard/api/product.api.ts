@@ -42,6 +42,9 @@ export const productApi = {
     getById: (id: string) =>
         http.get<{ success: boolean; data: Product }>(`product/${id}`),
 
+    getRelatedProducts: (id: string) =>
+        http.get<{ success: boolean; data: Product[] }>(`product/related/${id}`),
+
     create: (payload: FormData) =>
         http.post<{ success: boolean; data: Product }>('product', payload, {
             headers: { 'Content-Type': 'multipart/form-data' }

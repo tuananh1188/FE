@@ -41,6 +41,8 @@ export const CheckoutPage = () => {
   const [orderSuccess, setOrderSuccess] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+  const [userAddresses, setUserAddresses] = useState<any[]>([]);
+  const [showAddressBook, setShowAddressBook] = useState(false);
 
 
   // Voucher states
@@ -87,14 +89,30 @@ export const CheckoutPage = () => {
       if (tokenStore.get()) {
         try {
           const res = await authApi.getMe();
-          if (res.data) {
-              setForm((prev) => ({
-                ...prev,
-                fullName: prev.fullName || res.data.displayName || '',
-                phone: prev.phone || res.data.phone || '',
-                address: prev.address || res.data.address || '',
-                city: prev.city || res.data.city || '',
-              }));
+          if (res.data && res.data.data) {
+              const userData = res.data.data;
+              const addresses = userData.addresses || [];
+              setUserAddresses(addresses);
+
+              // Auto-fill with default address if exists
+              const defaultAddr = addresses.find((a: any) => a.isDefault);
+              if (defaultAddr) {
+                  setForm((prev) => ({
+                    ...prev,
+                    fullName: defaultAddr.fullName,
+                    phone: defaultAddr.phone,
+                    address: `${defaultAddr.detail}, ${defaultAddr.ward}, ${defaultAddr.province}`,
+                    city: defaultAddr.province,
+                  }));
+              } else {
+                  setForm((prev) => ({
+                    ...prev,
+                    fullName: prev.fullName || userData.displayName || '',
+                    phone: prev.phone || userData.phone || '',
+                    address: prev.address || userData.address || '',
+                    city: prev.city || userData.city || '',
+                  }));
+              }
           }
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
@@ -111,6 +129,18 @@ export const CheckoutPage = () => {
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
+  };
+
+  const selectSavedAddress = (addr: any) => {
+    setForm({
+      ...form,
+      fullName: addr.fullName,
+      phone: addr.phone,
+      address: `${addr.detail}, ${addr.ward}, ${addr.province}`,
+      city: addr.province,
+    });
+    setShowAddressBook(false);
+    toast.success(`Selected address: ${addr.label}`);
   };
 
   const validate = () => {
@@ -318,10 +348,49 @@ export const CheckoutPage = () => {
           <div className="w-full lg:flex-1 space-y-6">
             {/* Shipping Information */}
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <MapPin size={20} className="text-[#FF6B00]" />
-                Shipping Information
-              </h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <MapPin size={20} className="text-[#FF6B00]" />
+                  Shipping Information
+                </h2>
+                
+                {userAddresses.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-bold text-gray-400 uppercase mb-3">Ship to saved address:</p>
+                    <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                      {userAddresses.map((addr) => {
+                        const fullAddr = `${addr.detail}, ${addr.ward}, ${addr.province}`;
+                        const isSelected = form.address === fullAddr;
+                        
+                        return (
+                          <button
+                            key={addr._id}
+                            type="button"
+                            onClick={() => selectSavedAddress(addr)}
+                            className={`flex-shrink-0 w-60 p-4 rounded-xl border-2 text-left transition-all ${
+                              isSelected 
+                              ? 'border-[#FF6B00] bg-orange-50/50 ring-2 ring-orange-100' 
+                              : 'border-gray-100 hover:border-gray-200 bg-white'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                addr.label === 'Công ty' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                              }`}>
+                                {addr.label}
+                              </span>
+                              {isSelected && <CheckCircle2 size={14} className="text-[#FF6B00]" />}
+                            </div>
+                            <p className="text-sm font-bold text-gray-900 truncate">{addr.fullName}</p>
+                            <p className="text-xs text-gray-500 mb-2">{addr.phone}</p>
+                            <p className="text-[10px] text-gray-400 line-clamp-2 leading-relaxed">{fullAddr}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-5">
                 {/* Full Name */}

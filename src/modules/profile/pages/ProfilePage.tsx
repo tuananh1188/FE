@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Package, Heart } from 'lucide-react';
+import { Package, Heart, MapPin } from 'lucide-react';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
 import { AvatarUpload } from '@/modules/profile/components/AvatarUpload';
 import { ProfileEditForm } from '@/modules/profile/components/ProfileEditForm';
 import { OrderHistory } from '@/modules/profile/components/OrderHistory';
 import { FavoriteList } from '@/modules/profile/components/FavoriteList';
+import { AddressBook } from '@/modules/profile/components/AddressBook';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import type { CurrentUser } from '@/modules/auth/types/auth.types';
 
@@ -17,6 +18,7 @@ type ProfileUser = CurrentUser & {
   address?: string;
   city?: string;
   avatarUrl?: string;
+  addresses?: any[];
 };
 
 export const ProfilePage = () => {
@@ -26,7 +28,7 @@ export const ProfilePage = () => {
   const fetchUser = async () => {
     try {
       const res = await authApi.getMe();
-      setUser(res.data as ProfileUser);
+      setUser(res.data.data as ProfileUser);
     } catch {
       tokenStore.clear();
       navigate('/logout');
@@ -86,6 +88,30 @@ export const ProfilePage = () => {
                   )}
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Address Book */}
+        <div className="lg:col-span-8 space-y-6">
+          <Card className="border-none shadow-sm overflow-hidden bg-white">
+            <CardHeader className="bg-gray-50/50 border-b">
+              <CardTitle className="text-lg font-bold flex items-center gap-2">
+                <MapPin className="size-5 text-[#C83B1E]" />
+                Address Book
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-8">
+              {user ? (
+                <AddressBook 
+                  addresses={user.addresses || []} 
+                  onUpdate={fetchUser} 
+                />
+              ) : (
+                <div className="h-40 flex items-center justify-center">
+                  <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
