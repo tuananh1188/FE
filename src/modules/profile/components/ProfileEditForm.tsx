@@ -9,11 +9,9 @@ import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 
 const schema = z.object({
-  displayName: z.string().max(60, 'Max 60 characters').optional(),
-  bio: z.string().max(200, 'Max 200 characters').optional(),
-  phone: z.string().max(20, 'Max 20 characters').optional(),
-  address: z.string().max(200, 'Max 200 characters').optional(),
-  city: z.string().max(100, 'Max 100 characters').optional(),
+  displayName: z.string().max(60, 'Tối đa 60 ký tự').optional(),
+  bio: z.string().max(200, 'Tối đa 200 ký tự').optional(),
+  phone: z.string().max(20, 'Tối đa 20 ký tự').optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -37,10 +35,10 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
     setSaving(true);
     try {
       await profileApi.updateProfile(values);
-      toast.success('Profile updated successfully.');
+      toast.success('Cập nhật hồ sơ thành công.');
       onSuccess();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message ?? 'Failed to update profile.');
+      toast.error(err?.response?.data?.message ?? 'Cập nhật hồ sơ thất bại.');
     } finally {
       setSaving(false);
     }
@@ -49,10 +47,10 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
   return (
     <form className="space-y-5" onSubmit={onSubmit}>
       <div className="space-y-2">
-        <Label htmlFor="displayName">Display Name</Label>
+        <Label htmlFor="displayName">Tên hiển thị</Label>
         <Input
           id="displayName"
-          placeholder="Your name"
+          placeholder="Tên của bạn"
           {...register('displayName')}
         />
         {errors.displayName && (
@@ -62,13 +60,13 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="bio">Bio</Label>
+          <Label htmlFor="bio">Giới thiệu</Label>
           <span className="text-xs text-muted-foreground">{bioValue.length}/200</span>
         </div>
         <textarea
           id="bio"
           rows={3}
-          placeholder="Tell us a little about yourself..."
+          placeholder="Chia sẻ một chút về bản thân bạn..."
           className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           {...register('bio')}
         />
@@ -78,10 +76,10 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone</Label>
+        <Label htmlFor="phone">Số điện thoại</Label>
         <Input
           id="phone"
-          placeholder="+1 555 000 0000"
+          placeholder="09xx xxx xxx"
           {...register('phone')}
         />
         {errors.phone && (
@@ -89,33 +87,8 @@ export const ProfileEditForm = ({ defaultValues, onSuccess }: ProfileEditFormPro
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="address">Address</Label>
-          <Input
-            id="address"
-            placeholder="123 Street Name"
-            {...register('address')}
-          />
-          {errors.address && (
-            <p className="text-xs text-destructive">{errors.address.message}</p>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="city">City</Label>
-          <Input
-            id="city"
-            placeholder="New York"
-            {...register('city')}
-          />
-          {errors.city && (
-            <p className="text-xs text-destructive">{errors.city.message}</p>
-          )}
-        </div>
-      </div>
-
       <Button type="submit" className="w-full" disabled={saving}>
-        {saving ? 'Saving…' : 'Save Changes'}
+        {saving ? 'Đang lưu…' : 'Lưu thay đổi'}
       </Button>
     </form>
   );

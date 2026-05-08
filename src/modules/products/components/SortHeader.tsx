@@ -11,14 +11,14 @@ interface SortHeaderProps {
 }
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
-    { label: 'Top Sales', value: 'top_sales' },
-    { label: 'Price: Low to High', value: 'price_asc' },
-    { label: 'Price: High to Low', value: 'price_desc' },
-    { label: 'Newest Arrivals', value: 'newest' }
+    { label: 'Bán chạy nhất', value: 'top_sales' },
+    { label: 'Giá: Thấp đến Cao', value: 'price_asc' },
+    { label: 'Giá: Cao đến Thấp', value: 'price_desc' },
+    { label: 'Mới nhất', value: 'newest' }
 ];
 
 export const SortHeader = ({ totalItems, categoryName, currentSort, onSortChange, itemRange }: SortHeaderProps) => {
-    const currentLabel = SORT_OPTIONS.find(opt => opt.value === currentSort)?.label || 'Top Sales';
+    const currentLabel = SORT_OPTIONS.find(opt => opt.value === currentSort)?.label || 'Bán chạy nhất';
 
     return (
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-4">
@@ -27,13 +27,13 @@ export const SortHeader = ({ totalItems, categoryName, currentSort, onSortChange
                     {categoryName}
                 </h1>
                 {itemRange ? (
-                    <p className="text-gray-500 text-sm font-medium">Showing <span className="font-bold text-gray-900">{itemRange}</span> of <span className="font-bold text-gray-900">{totalItems.toLocaleString()}</span> items</p>
+                    <p className="text-gray-500 text-sm font-medium">Hiển thị <span className="font-bold text-gray-900">{itemRange}</span> trong số <span className="font-bold text-gray-900">{totalItems.toLocaleString()}</span> sản phẩm</p>
                 ) : (
-                    <p className="text-gray-500 text-sm font-medium">Showing <span className="font-bold text-gray-900">{totalItems.toLocaleString()}</span> items</p>
+                    <p className="text-gray-500 text-sm font-medium">Hiển thị <span className="font-bold text-gray-900">{totalItems.toLocaleString()}</span> sản phẩm</p>
                 )}
             </div>
             <div className="flex items-center gap-4">
-                <span className="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em]">Sort by:</span>
+                <span className="text-gray-500 text-[10px] uppercase font-bold tracking-[0.2em]">Sắp xếp:</span>
                 <div className="relative group">
                     <button className="flex items-center gap-10 bg-white border border-gray-200 shadow-sm rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 hover:border-[#C83B1E] hover:text-[#C83B1E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C83B1E]/20">
                         <span>{currentLabel}</span>

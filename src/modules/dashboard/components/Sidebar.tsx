@@ -5,14 +5,14 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-    { icon: <LayoutDashboard size={20} />, label: 'Dashboard', to: '/admin' },
-    { icon: <ShoppingBag size={20} />, label: 'Products', to: '/admin/products' },
-    { icon: <LayoutGrid size={20} />, label: 'Categories', to: '/admin/categories' },
-    { icon: <ShoppingCart size={20} />, label: 'Orders', to: '/admin/orders' },
-    { icon: <Ticket size={20} />, label: 'Vouchers', to: '/admin/vouchers' },
-    { icon: <User size={20} />, label: 'Users', to: '/admin/users' },
-    { icon: <BarChart3 size={20} />, label: 'Reports', to: '/admin/reports' },
-    { icon: <Settings size={20} />, label: 'Settings', to: '/admin/settings' },
+    { icon: <LayoutDashboard size={20} />, label: 'Bảng điều khiển', to: '/admin' },
+    { icon: <ShoppingBag size={20} />, label: 'Sản phẩm', to: '/admin/products' },
+    { icon: <LayoutGrid size={20} />, label: 'Danh mục', to: '/admin/categories' },
+    { icon: <ShoppingCart size={20} />, label: 'Đơn hàng', to: '/admin/orders' },
+    { icon: <Ticket size={20} />, label: 'Mã giảm giá', to: '/admin/vouchers' },
+    { icon: <User size={20} />, label: 'Người dùng', to: '/admin/users' },
+    { icon: <BarChart3 size={20} />, label: 'Báo cáo', to: '/admin/reports' },
+    { icon: <Settings size={20} />, label: 'Cài đặt', to: '/admin/settings' },
 ];
 
 export default function Sidebar() {
@@ -32,7 +32,7 @@ export default function Sidebar() {
                 </div>
                 <div>
                     <h1 className="text-lg font-bold text-gray-800 leading-none">Vitality Admin</h1>
-                    <span className="text-xs text-gray-400">Manage your store</span>
+                    <span className="text-xs text-gray-400">Quản lý cửa hàng</span>
                 </div>
             </div>
 
@@ -65,14 +65,14 @@ export default function Sidebar() {
                     className="flex items-center gap-3 p-3 text-orange-600 hover:bg-orange-50 rounded-xl cursor-pointer transition-colors text-sm font-medium"
                 >
                     <ExternalLink size={20} />
-                    <span>View Store</span>
+                    <span>Xem cửa hàng</span>
                 </a>
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 p-3 text-gray-500 rounded-xl hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors text-sm font-medium w-full"
                 >
                     <LogOut size={20} />
-                    <span>Logout</span>
+                    <span>Đăng xuất</span>
                 </button>
             </div>
         </div>

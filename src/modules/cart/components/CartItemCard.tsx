@@ -115,7 +115,7 @@ export const CartItemCard = ({ item }: CartItemCardProps) => {
           </div>
           
           <div className="text-lg font-black text-gray-900">
-            ${(price * quantity).toFixed(2)}
+            {((price * quantity) * 25400).toLocaleString('vi-VN')}đ
           </div>
         </div>
       </div>

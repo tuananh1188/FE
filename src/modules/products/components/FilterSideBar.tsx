@@ -45,7 +45,7 @@ export const FilterSideBar = ({ minPrice, maxPrice, onPriceChange }: FilterSideB
             <div className="sticky top-24 space-y-10">
                 {/* Category */}
                 <div>
-                    <h4 className="text-gray-900 text-xs font-black uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Category</h4>
+                    <h4 className="text-gray-900 text-xs font-black uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Danh mục</h4>
                     <div className="space-y-3">
                         <label className="flex items-center gap-3 cursor-pointer group">
                             <input 
@@ -55,7 +55,7 @@ export const FilterSideBar = ({ minPrice, maxPrice, onPriceChange }: FilterSideB
                                 onChange={() => navigate('/categories')}
                             />
                             <span className={`text-sm font-medium transition-colors ${!slug ? 'text-[#C83B1E]' : 'text-gray-600 group-hover:text-[#C83B1E]'}`}>
-                                All Categories
+                                Tất cả danh mục
                             </span>
                         </label>
                         {categories.map((cat) => (
@@ -83,7 +83,7 @@ export const FilterSideBar = ({ minPrice, maxPrice, onPriceChange }: FilterSideB
                 {/* Price Range */}
                 <div>
                     <div className="flex items-center justify-between mb-4 border-b border-gray-200 pb-2">
-                        <h4 className="text-gray-900 text-xs font-black uppercase tracking-widest">Price</h4>
+                        <h4 className="text-gray-900 text-xs font-black uppercase tracking-widest">Giá</h4>
                         <span className="text-[#C83B1E] text-xs font-bold bg-red-50 px-2 py-1 rounded-md">$0 - ${localMaxPrice.toLocaleString()}</span>
                     </div>
                     <input 
@@ -107,7 +107,7 @@ export const FilterSideBar = ({ minPrice, maxPrice, onPriceChange }: FilterSideB
                         className="w-full mt-4 text-[11px] h-7 text-gray-400 hover:text-[#C83B1E] font-bold"
                         onClick={() => onPriceChange(0, 0)}
                     >
-                        Reset Price Filter
+                        Đặt lại bộ lọc giá
                     </Button>
                 </div>
             </div>

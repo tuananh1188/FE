@@ -10,13 +10,13 @@ interface OrderTableProps {
 
 const columns: ColumnsType<OrderAPIResponse> = [
     {
-        title: 'ORDER ID',
+        title: 'MÃ ĐƠN HÀNG',
         dataIndex: '_id',
         key: '_id',
         render: (id) => <span className="font-bold text-xs">#{id.slice(-8).toUpperCase()}</span>
     },
     {
-        title: 'CUSTOMER',
+        title: 'KHÁCH HÀNG',
         dataIndex: 'shippingAddress',
         key: 'customer',
         render: (shippingAddress, record) => (
@@ -25,39 +25,40 @@ const columns: ColumnsType<OrderAPIResponse> = [
                     {shippingAddress?.fullName?.[0] || '?'}
                 </Avatar>
                 <div className="flex flex-col">
-                    <span className="font-medium text-sm">{shippingAddress?.fullName || 'Anonymous'}</span>
+                    <span className="font-medium text-sm">{shippingAddress?.fullName || 'Ẩn danh'}</span>
                     <span className="text-[10px] text-gray-400">{(record.userId as any)?.email || 'N/A'}</span>
                 </div>
             </div>
         ),
     },
     {
-        title: 'DATE',
+        title: 'NGÀY ĐẶT',
         dataIndex: 'createdAt',
         key: 'createdAt',
-        render: (date) => <span className="text-gray-500 text-xs">{new Date(date).toLocaleDateString()}</span>
+        render: (date) => <span className="text-gray-500 text-xs">{new Date(date).toLocaleDateString('vi-VN')}</span>
     },
     {
-        title: 'AMOUNT',
+        title: 'TỔNG TIỀN',
         dataIndex: 'totalAmount',
         key: 'totalAmount',
-        render: (amount) => <span className="font-bold text-sm">${amount.toFixed(2)}</span>
+        render: (amount) => <span className="font-bold text-sm">{(amount * 25400).toLocaleString('vi-VN')}đ</span>
     },
     {
-        title: 'STATUS',
+        title: 'TRẠNG THÁI',
         dataIndex: 'orderStatus',
         key: 'orderStatus',
         render: (status) => {
             let color = 'gray';
-            if (status === 'DELIVERED') color = 'green';
-            if (status === 'PENDING') color = 'orange';
-            if (status === 'PROCESSING') color = 'blue';
-            if (status === 'CANCELLED') color = 'red';
-            return <Tag color={color} className="rounded-full border-none px-3 text-[10px] font-bold">{status}</Tag>
+            let label = status;
+            if (status === 'DELIVERED') { color = 'green'; label = 'ĐÃ GIAO'; }
+            if (status === 'PENDING') { color = 'orange'; label = 'CHỜ XÁC NHẬN'; }
+            if (status === 'PROCESSING') { color = 'blue'; label = 'ĐANG XỬ LÝ'; }
+            if (status === 'CANCELLED') { color = 'red'; label = 'ĐÃ HỦY'; }
+            return <Tag color={color} className="rounded-full border-none px-3 text-[10px] font-black">{label}</Tag>
         }
     },
     {
-        title: 'ACTIONS',
+        title: 'THAO TÁC',
         key: 'actions',
         render: () => (
             <MoreHorizontal className="text-gray-400 cursor-pointer" />
@@ -68,7 +69,7 @@ const columns: ColumnsType<OrderAPIResponse> = [
 const OrderTable: React.FC<OrderTableProps> = ({ recentOrders }) => (
     <div className="bg-white p-6 rounded-2xl shadow-sm mt-8 border border-gray-50">
         <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
+            <h2 className="text-lg font-bold text-gray-900">Đơn hàng gần đây</h2>
             <button className="p-2 hover:bg-gray-50 rounded-lg border border-gray-100 transition-colors">
                 <BarChart3 size={18} className="rotate-90 text-gray-400" />
             </button>
@@ -81,10 +82,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ recentOrders }) => (
             className="custom-table" 
         />
         <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-50">
-            <p className="text-xs text-gray-400 font-medium">Showing latest {recentOrders.length} orders</p>
+            <p className="text-xs text-gray-400 font-medium">Hiển thị {recentOrders.length} đơn hàng mới nhất</p>
             <div className="flex gap-4">
-                <button className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">{'PREVIOUS'}</button>
-                <button className="text-xs font-bold text-[#FF6B00] hover:text-[#E65A00] transition-colors">NEXT {' >'}</button>
+                <button className="text-xs font-bold text-gray-400 hover:text-gray-600 transition-colors">{'TRƯỚC'}</button>
+                <button className="text-xs font-bold text-[#FF6B00] hover:text-[#E65A00] transition-colors">TIẾP THEO {' >'}</button>
             </div>
         </div>
     </div>

@@ -31,7 +31,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
   const [provinces, setProvinces] = useState<any[]>([]);
   const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
-
+ 
   const [form, setForm] = useState({
     label: 'Nhà riêng',
     fullName: '',
@@ -42,35 +42,33 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
     detail: '',
     isDefault: false
   });
-
+ 
   const [loading, setLoading] = useState(false);
-
+ 
   const [allWards, setAllWards] = useState<any[]>([]);
-
+ 
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
         const res = await axios.get('https://provinces.open-api.vn/api/p/');
         setProvinces(res.data);
       } catch (error) {
-        console.error('Error fetching provinces:', error);
+        console.error('Lỗi khi tải danh sách tỉnh thành:', error);
       }
     };
     fetchProvinces();
   }, []);
-
+ 
   const handleProvinceChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const provinceName = e.target.value;
     const province = provinces.find(p => p.name === provinceName);
     setForm({ ...form, province: provinceName, district: '', ward: '' });
     setAllWards([]);
-
+ 
     if (province) {
       try {
-        // Fetch depth 3 to get all districts and their wards in one go
         const res = await axios.get(`https://provinces.open-api.vn/api/p/${province.code}?depth=3`);
         const districts = res.data.districts;
-        // Flatten all wards and keep track of which district they belong to
         const flattenedWards: any[] = [];
         districts.forEach((d: any) => {
           d.wards.forEach((w: any) => {
@@ -80,21 +78,20 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
             });
           });
         });
-        // Sort wards alphabetically for easier search
         flattenedWards.sort((a, b) => a.name.localeCompare(b.name));
         setAllWards(flattenedWards);
       } catch (error) {
-        console.error('Error fetching wards:', error);
+        console.error('Lỗi khi tải danh sách phường xã:', error);
       }
     }
   };
-
+ 
   const [isManualWard, setIsManualWard] = useState(false);
-
+ 
   const handleWardChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const wardName = e.target.value;
     if (isManualWard) {
-      setForm({ ...form, ward: wardName, district: '' }); // When manual, district is unknown
+      setForm({ ...form, ward: wardName, district: '' });
     } else {
       const ward = allWards.find(w => w.name === wardName);
       if (ward) {
@@ -104,29 +101,29 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
       }
     }
   };
-
+ 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       if (editingId) {
         await profileApi.updateAddress(editingId, form);
-        toast.success('Address updated successfully');
+        toast.success('Cập nhật địa chỉ thành công');
       } else {
         await profileApi.addAddress(form);
-        toast.success('Address added successfully');
+        toast.success('Thêm địa chỉ thành công');
       }
       setIsAdding(false);
       setEditingId(null);
       resetForm();
       onUpdate();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Action failed');
+      toast.error(error?.response?.data?.message || 'Thao tác thất bại');
     } finally {
       setLoading(false);
     }
   };
-
+ 
   const resetForm = () => {
     setForm({
       label: 'Nhà riêng',
@@ -141,28 +138,28 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
     setAllWards([]);
     setIsManualWard(false);
   };
-
+ 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this address?')) return;
+    if (!window.confirm('Bạn có chắc chắn muốn xóa địa chỉ này?')) return;
     try {
       await profileApi.deleteAddress(id);
-      toast.success('Address deleted successfully');
+      toast.success('Xóa địa chỉ thành công');
       onUpdate();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Delete failed');
+      toast.error(error?.response?.data?.message || 'Xóa thất bại');
     }
   };
-
+ 
   const handleSetDefault = async (id: string) => {
     try {
       await profileApi.setDefaultAddress(id);
-      toast.success('Default address updated');
+      toast.success('Đã cập nhật địa chỉ mặc định');
       onUpdate();
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Update failed');
+      toast.error(error?.response?.data?.message || 'Cập nhật thất bại');
     }
   };
-
+ 
   const startEditing = (addr: Address) => {
     setForm({
       label: addr.label,
@@ -176,33 +173,32 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
     });
     setEditingId(addr._id);
     setIsAdding(true);
-    // Note: In a real app, you'd need to re-fetch districts/wards for the selected province/district
   };
-
+ 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-bold flex items-center gap-2 text-gray-800">
           <MapPin className="size-5 text-[#C83B1E]" />
-          Address Book
+          Sổ địa chỉ
         </h3>
         {!isAdding && (
           <Button 
             onClick={() => { setIsAdding(true); resetForm(); }}
             className="bg-[#C83B1E] hover:bg-[#b03318] text-white"
           >
-            <Plus className="size-4 mr-2" /> Add New Address
+            <Plus className="size-4 mr-2" /> Thêm địa chỉ mới
           </Button>
         )}
       </div>
-
+ 
       {isAdding ? (
         <Card className="border-2 border-dashed border-gray-200 shadow-none">
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Label</label>
+                  <label className="text-sm font-semibold text-gray-700">Loại địa chỉ</label>
                   <select 
                     className="w-full h-10 px-3 rounded-md border border-gray-200 text-sm"
                     value={form.label}
@@ -214,16 +210,16 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Full Name</label>
+                  <label className="text-sm font-semibold text-gray-700">Họ và tên</label>
                   <Input 
-                    placeholder="Recipient's name"
+                    placeholder="Tên người nhận"
                     value={form.fullName}
                     onChange={(e) => setForm({...form, fullName: e.target.value})}
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Phone Number</label>
+                  <label className="text-sm font-semibold text-gray-700">Số điện thoại</label>
                   <Input 
                     placeholder="0xxx xxx xxx"
                     value={form.phone}
@@ -232,31 +228,31 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Province / City</label>
+                  <label className="text-sm font-semibold text-gray-700">Tỉnh / Thành phố</label>
                   <select 
                     className="w-full h-10 px-3 rounded-md border border-gray-200 text-sm"
                     value={form.province}
                     onChange={handleProvinceChange}
                     required
                   >
-                    <option value="">Select Province</option>
+                    <option value="">Chọn Tỉnh/Thành</option>
                     {provinces.map(p => <option key={p.code} value={p.name}>{p.name}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm font-semibold text-gray-700">Ward / Commune</label>
+                    <label className="text-sm font-semibold text-gray-700">Phường / Xã</label>
                     <button 
                       type="button" 
                       onClick={() => setIsManualWard(!isManualWard)}
                       className="text-[10px] font-bold text-blue-600 hover:underline"
                     >
-                      {isManualWard ? 'Select from list' : 'Enter manually'}
+                      {isManualWard ? 'Chọn từ danh sách' : 'Nhập thủ công'}
                     </button>
                   </div>
                   {isManualWard ? (
                     <Input 
-                      placeholder="Enter ward name"
+                      placeholder="Nhập tên phường/xã"
                       value={form.ward}
                       onChange={handleWardChange}
                       required
@@ -269,7 +265,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                       disabled={!form.province}
                       required
                     >
-                      <option value="">Select Ward</option>
+                      <option value="">Chọn Phường/Xã</option>
                       {allWards.map(w => (
                         <option key={w.code} value={w.name}>
                           {w.name}
@@ -279,9 +275,9 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                   )}
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Detailed Address</label>
+                  <label className="text-sm font-semibold text-gray-700">Địa chỉ chi tiết</label>
                   <Input 
-                    placeholder="House number, street name..."
+                    placeholder="Số nhà, tên đường..."
                     value={form.detail}
                     onChange={(e) => setForm({...form, detail: e.target.value})}
                     required
@@ -295,17 +291,17 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                     onChange={(e) => setForm({...form, isDefault: e.target.checked})}
                     className="size-4 rounded border-gray-300 text-[#C83B1E] focus:ring-[#C83B1E]"
                   />
-                  <label htmlFor="isDefault" className="text-sm font-medium text-gray-600">Set as default address</label>
+                  <label htmlFor="isDefault" className="text-sm font-medium text-gray-600">Đặt làm địa chỉ mặc định</label>
                 </div>
               </div>
-
+ 
               <div className="flex gap-3 pt-2">
                 <Button 
                   type="submit" 
                   disabled={loading}
                   className="bg-gray-900 text-white"
                 >
-                  {loading ? 'Saving...' : editingId ? 'Update Address' : 'Add Address'}
+                  {loading ? 'Đang lưu...' : editingId ? 'Cập nhật địa chỉ' : 'Thêm địa chỉ'}
                 </Button>
                 <Button 
                   type="button" 
@@ -313,7 +309,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                   onClick={() => { setIsAdding(false); setEditingId(null); }}
                   disabled={loading}
                 >
-                  Cancel
+                  Hủy
                 </Button>
               </div>
             </form>
@@ -332,7 +328,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                     </span>
                     {addr.isDefault && (
                       <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-green-100 text-green-700 flex items-center gap-1">
-                        <CheckCircle2 size={10} /> Default
+                        <CheckCircle2 size={10} /> Mặc định
                       </span>
                     )}
                   </div>
@@ -345,7 +341,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                     </button>
                   </div>
                 </div>
-
+ 
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
                     <User className="size-3.5 text-gray-400" />
@@ -363,29 +359,29 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
                     </span>
                   </div>
                 </div>
-
+ 
                 {!addr.isDefault && (
                   <button 
                     onClick={() => handleSetDefault(addr._id)}
                     className="mt-4 text-xs font-bold text-blue-600 hover:underline transition-all"
                   >
-                    Set as default
+                    Đặt làm mặc định
                   </button>
                 )}
               </CardContent>
             </Card>
           ))}
-
+ 
           {addresses.length === 0 && (
             <div className="col-span-full py-10 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
               <MapPin className="size-10 text-gray-300 mx-auto mb-3" />
-              <p className="text-sm text-gray-500">Your address book is empty.</p>
+              <p className="text-sm text-gray-500">Sổ địa chỉ của bạn đang trống.</p>
               <Button 
                 variant="link" 
                 onClick={() => setIsAdding(true)}
                 className="text-[#C83B1E] font-bold"
               >
-                Add your first address
+                Thêm địa chỉ đầu tiên
               </Button>
             </div>
           )}

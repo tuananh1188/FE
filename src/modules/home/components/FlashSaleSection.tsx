@@ -47,14 +47,14 @@ export const FlashSaleSection = () => {
     loadProducts();
   }, []);
 
-  if (loading) return <div className='py-10 text-center text-gray-500'>Loading...</div>
+  if (loading) return <div className='py-10 text-center text-gray-500'>Đang tải...</div>
   if (error) return <div className='py-10 text-center text-red-500'>{error}</div>
 
   return (
     <section>
       <div className="flex items-center gap-4 mb-6">
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Zap className="size-5 text-[#C83B1E] fill-[#C83B1E]" /> Flash Sale
+          <Zap className="size-5 text-[#C83B1E] fill-[#C83B1E]" /> Khuyến mãi
         </h2>
         <CountdownTimer initialSeconds={4 * 3600 + 12 * 60 + 55} />
       </div>
@@ -76,7 +76,7 @@ export const FlashSaleSection = () => {
         ))}
       </div>
       
-      {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}
+      {products.length === 0 && <p className='text-center text-gray-500'>Không tìm thấy sản phẩm nào</p>}
       
       {products.length > 0 && (
         <div className="text-center mt-6">
@@ -85,7 +85,7 @@ export const FlashSaleSection = () => {
             className="border-[#C83B1E] text-[#C83B1E] hover:bg-red-50 px-10 hover:cursor-pointer"
             onClick={() => navigate('/categories/flash-sale')}
           >
-            View All Flash Sale
+            Xem tất cả
           </Button>
         </div>
       )}

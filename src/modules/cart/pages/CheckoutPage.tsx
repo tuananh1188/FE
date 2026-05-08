@@ -66,10 +66,10 @@ export const CheckoutPage = () => {
       if (res.data.success) {
         setAppliedVoucher(res.data.voucher);
         setDiscount(res.data.discount);
-        toast.success(`Coupon applied: -$${res.data.discount.toFixed(2)}`);
+        toast.success(`Đã áp dụng mã giảm giá: -${(res.data.discount * 25400).toLocaleString('vi-VN')}đ`);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Invalid voucher code');
+      toast.error(error?.response?.data?.message || 'Mã giảm giá không hợp lệ');
       setAppliedVoucher(null);
       setDiscount(0);
     } finally {
@@ -81,7 +81,7 @@ export const CheckoutPage = () => {
     setAppliedVoucher(null);
     setDiscount(0);
     setVoucherCode('');
-    toast.info('Voucher removed');
+    toast.info('Đã gỡ mã giảm giá');
   };
 
   React.useEffect(() => {
@@ -140,16 +140,16 @@ export const CheckoutPage = () => {
       city: addr.province,
     });
     setShowAddressBook(false);
-    toast.success(`Selected address: ${addr.label}`);
+    toast.success(`Đã chọn địa chỉ: ${addr.label}`);
   };
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!form.phone.trim()) newErrors.phone = 'Phone number is required';
+    if (!form.fullName.trim()) newErrors.fullName = 'Họ và tên là bắt buộc';
+    if (!form.phone.trim()) newErrors.phone = 'Số điện thoại là bắt buộc';
     else if (!/^[0-9]{9,15}$/.test(form.phone.replace(/\s/g, '')))
-      newErrors.phone = 'Invalid phone number';
-    if (!form.address.trim()) newErrors.address = 'Delivery address is required';
+      newErrors.phone = 'Số điện thoại không hợp lệ';
+    if (!form.address.trim()) newErrors.address = 'Địa chỉ giao hàng là bắt buộc';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -158,7 +158,7 @@ export const CheckoutPage = () => {
     e.preventDefault();
     if (!validate()) return;
     if (cartItems.length === 0) {
-      toast.error('Your cart is empty');
+      toast.error('Giỏ hàng của bạn đang trống');
       return;
     }
 
@@ -180,10 +180,10 @@ export const CheckoutPage = () => {
       if (res.data.success) {
         setOrderSuccess(res.data.data);
         await clearCart();
-        toast.success('🎉 Order placed successfully!');
+        toast.success('🎉 Đặt hàng thành công!');
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Checkout failed. Please try again.');
+      toast.error(error?.response?.data?.message || 'Thanh toán thất bại. Vui lòng thử lại.');
     } finally {
       setIsSubmitting(false);
     }
@@ -196,11 +196,11 @@ export const CheckoutPage = () => {
       setIsConfirmingPayment(true);
       const res = await orderApi.confirmPayment(orderSuccess._id);
       if (res.data.success) {
-        toast.success('Payment confirmed! Your order is being processed.');
+        toast.success('Đã xác nhận thanh toán! Đơn hàng đang được xử lý.');
         setOrderSuccess(res.data.data);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to confirm payment');
+      toast.error(error?.response?.data?.message || 'Xác nhận thanh toán thất bại');
     } finally {
       setIsConfirmingPayment(false);
     }
@@ -212,15 +212,15 @@ export const CheckoutPage = () => {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center py-20">
         <Package size={64} className="text-gray-200 mb-6" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">No items to checkout</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Không có sản phẩm để thanh toán</h2>
         <p className="text-gray-500 mb-8 text-center">
-          Add some products to your cart first.
+          Vui lòng thêm sản phẩm vào giỏ hàng trước.
         </p>
         <Link
           to="/categories"
           className="bg-[#FF6B00] hover:bg-[#E65A00] text-white px-8 py-3 rounded-xl font-bold transition-all shadow-md"
         >
-          Browse Products
+          Xem sản phẩm
         </Link>
       </div>
     );
@@ -234,36 +234,36 @@ export const CheckoutPage = () => {
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={48} className="text-green-500" />
           </div>
-          <h2 className="text-3xl font-black text-gray-900 mb-2">Order Confirmed!</h2>
+          <h2 className="text-3xl font-black text-gray-900 mb-2">Đặt hàng thành công!</h2>
           <p className="text-gray-500 mb-6">
-            Thank you for your purchase. Your order has been placed successfully.
+            Cảm ơn bạn đã mua sắm. Đơn hàng của bạn đã được tiếp nhận.
           </p>
 
           <div className="bg-gray-50 rounded-xl p-5 mb-6 text-left space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Order ID</span>
+              <span className="text-gray-500">Mã đơn hàng</span>
               <span className="font-mono font-bold text-gray-800 text-xs">
                 #{orderSuccess._id?.slice(-8).toUpperCase()}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Items</span>
-              <span className="font-semibold text-gray-800">{orderSuccess.items?.length} product(s)</span>
+              <span className="text-gray-500">Số lượng</span>
+              <span className="font-semibold text-gray-800">{orderSuccess.items?.length} sản phẩm</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Total</span>
-              <span className="font-bold text-[#FF6B00] text-lg">${orderSuccess.totalAmount?.toFixed(2)}</span>
+              <span className="text-gray-500">Tổng thanh toán</span>
+              <span className="font-bold text-[#FF6B00] text-lg">{(orderSuccess.totalAmount * 25400).toLocaleString('vi-VN')}đ</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Payment</span>
+              <span className="text-gray-500">Phương thức</span>
               <span className="font-semibold text-gray-800">
-                {orderSuccess.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Credit Card'}
+                {orderSuccess.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng' : orderSuccess.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản' : 'Thẻ tín dụng'}
               </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Status</span>
+              <span className="text-gray-500">Trạng thái</span>
               <span className="px-2.5 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold">
-                {orderSuccess.orderStatus}
+                {orderSuccess.orderStatus === 'PENDING' ? 'Chờ xử lý' : orderSuccess.orderStatus}
               </span>
             </div>
           </div>
@@ -315,13 +315,13 @@ export const CheckoutPage = () => {
               variant="outline"
               className="flex-1 py-5 rounded-xl font-bold cursor-pointer"
             >
-              Back to Home
+              Về trang chủ
             </Button>
             <Button
               onClick={() => navigate('/profile')}
               className="flex-1 bg-[#FF6B00] hover:bg-[#E65A00] text-white py-5 rounded-xl font-bold cursor-pointer"
             >
-              View Orders
+              Xem đơn hàng
             </Button>
           </div>
         </div>
@@ -339,7 +339,7 @@ export const CheckoutPage = () => {
         >
           <ArrowLeft size={24} />
         </Link>
-        <h1 className="text-3xl font-black text-[#FF6B00]">Checkout</h1>
+        <h1 className="text-3xl font-black text-[#FF6B00]">Thanh toán</h1>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -351,12 +351,12 @@ export const CheckoutPage = () => {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                   <MapPin size={20} className="text-[#FF6B00]" />
-                  Shipping Information
+                  Thông tin nhận hàng
                 </h2>
                 
                 {userAddresses.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs font-bold text-gray-400 uppercase mb-3">Ship to saved address:</p>
+                    <p className="text-xs font-bold text-gray-400 uppercase mb-3">Sử dụng địa chỉ đã lưu:</p>
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                       {userAddresses.map((addr) => {
                         const fullAddr = `${addr.detail}, ${addr.ward}, ${addr.province}`;
@@ -396,7 +396,7 @@ export const CheckoutPage = () => {
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Full Name <span className="text-red-500">*</span>
+                    Họ và tên <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <User
@@ -407,7 +407,7 @@ export const CheckoutPage = () => {
                       name="fullName"
                       value={form.fullName}
                       onChange={handleChange}
-                      placeholder="Nguyen Van A"
+                      placeholder="Nguyễn Văn A"
                       className={`pl-10 py-5 bg-gray-50/50 border ${errors.fullName ? 'border-red-400 focus:ring-red-400' : 'border-gray-200'}`}
                     />
                   </div>
@@ -419,7 +419,7 @@ export const CheckoutPage = () => {
                 {/* Phone */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Phone Number <span className="text-red-500">*</span>
+                    Số điện thoại <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <Phone
@@ -442,7 +442,7 @@ export const CheckoutPage = () => {
                 {/* Address */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Delivery Address <span className="text-red-500">*</span>
+                    Địa chỉ giao hàng <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <MapPin
@@ -453,7 +453,7 @@ export const CheckoutPage = () => {
                       name="address"
                       value={form.address}
                       onChange={handleChange}
-                      placeholder="123 Nguyen Trai, Quan 1"
+                      placeholder="Số 123 Nguyễn Trãi, Quận 1"
                       className={`pl-10 py-5 bg-gray-50/50 border ${errors.address ? 'border-red-400 focus:ring-red-400' : 'border-gray-200'}`}
                     />
                   </div>
@@ -465,7 +465,7 @@ export const CheckoutPage = () => {
                 {/* City */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    City
+                    Tỉnh / Thành phố
                   </label>
                   <div className="relative">
                     <Building2
@@ -476,7 +476,7 @@ export const CheckoutPage = () => {
                       name="city"
                       value={form.city}
                       onChange={handleChange}
-                      placeholder="Ho Chi Minh City"
+                      placeholder="Hồ Chí Minh"
                       className="pl-10 py-5 bg-gray-50/50 border border-gray-200"
                     />
                   </div>
@@ -485,7 +485,7 @@ export const CheckoutPage = () => {
                 {/* Notes */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Order Notes
+                    Ghi chú đơn hàng
                   </label>
                   <div className="relative">
                     <MessageSquare
@@ -496,7 +496,7 @@ export const CheckoutPage = () => {
                       name="notes"
                       value={form.notes}
                       onChange={handleChange}
-                      placeholder="Special instructions for delivery..."
+                      placeholder="Lời nhắn cho shipper hoặc ghi chú thêm..."
                       rows={3}
                       className="w-full pl-10 pr-4 py-3 bg-gray-50/50 border border-gray-200 rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#FF6B00]/30 focus:border-[#FF6B00]"
                     />
@@ -509,7 +509,7 @@ export const CheckoutPage = () => {
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
               <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <CreditCard size={20} className="text-[#FF6B00]" />
-                Payment Method
+                Phương thức thanh toán
               </h2>
 
               <div className="space-y-3">
@@ -539,8 +539,8 @@ export const CheckoutPage = () => {
                   </div>
                   <Banknote size={24} className="text-green-600" />
                   <div>
-                    <p className="font-bold text-gray-800 text-sm">Cash on Delivery (COD)</p>
-                    <p className="text-xs text-gray-500">Pay when you receive your order</p>
+                    <p className="font-bold text-gray-800 text-sm">Thanh toán khi nhận hàng (COD)</p>
+                    <p className="text-xs text-gray-500">Thanh toán bằng tiền mặt khi giao hàng</p>
                   </div>
                 </label>
 
@@ -570,7 +570,7 @@ export const CheckoutPage = () => {
                   </div>
                   <CreditCard size={24} className="text-blue-600" />
                   <div>
-                    <p className="font-bold text-gray-800 text-sm">Credit / Debit Card</p>
+                    <p className="font-bold text-gray-800 text-sm">Thẻ tín dụng / Ghi nợ</p>
                     <p className="text-xs text-gray-500">Visa, Mastercard, JCB</p>
                   </div>
                 </label>
@@ -614,7 +614,7 @@ export const CheckoutPage = () => {
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100 sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Package size={20} className="text-[#FF6B00]" />
-                Order Review
+                Kiểm tra đơn hàng
               </h2>
 
               {/* Items Preview */}
@@ -643,10 +643,10 @@ export const CheckoutPage = () => {
                         <p className="text-sm font-semibold text-gray-800 truncate">
                           {item.product.name}
                         </p>
-                        <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-xs text-gray-500">SL: {item.quantity}</p>
                       </div>
                       <span className="font-bold text-sm text-gray-900">
-                        ${(itemPrice * item.quantity).toFixed(2)}
+                        {((itemPrice * item.quantity) * 25400).toLocaleString('vi-VN')}đ
                       </span>
                     </div>
                   );
@@ -656,26 +656,26 @@ export const CheckoutPage = () => {
               {/* Price Breakdown */}
               <div className="border-t border-gray-100 pt-4 space-y-3 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
+                  <span>Tạm tính</span>
                   <span className="font-semibold text-gray-900">
-                    ${cartSubtotal.toFixed(2)}
+                    {(cartSubtotal * 25400).toLocaleString('vi-VN')}đ
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span className="font-semibold text-green-600">Free</span>
+                  <span>Phí vận chuyển</span>
+                  <span className="font-semibold text-green-600">Miễn phí</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Tax (8%)</span>
-                  <span className="font-semibold text-gray-900">${tax.toFixed(2)}</span>
+                  <span>Thuế (8%)</span>
+                  <span className="font-semibold text-gray-900">{(tax * 25400).toLocaleString('vi-VN')}đ</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-[#C83B1E] font-medium bg-red-50 p-2 rounded-lg">
                     <span className="flex items-center gap-1">
                       <Tag size={14} />
-                      Voucher ({appliedVoucher?.code})
+                      Giảm giá ({appliedVoucher?.code})
                     </span>
-                    <span>-${discount.toFixed(2)}</span>
+                    <span>-{(discount * 25400).toLocaleString('vi-VN')}đ</span>
                   </div>
                 )}
               </div>
@@ -686,7 +686,7 @@ export const CheckoutPage = () => {
                   <div className="relative flex-1">
                     <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                     <Input 
-                      placeholder="Promo code" 
+                      placeholder="Mã giảm giá" 
                       value={voucherCode}
                       onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
                       className="pl-10 h-10 bg-gray-50/50 border-gray-200 uppercase"
@@ -700,7 +700,7 @@ export const CheckoutPage = () => {
                       onClick={handleRemoveVoucher}
                       className="h-10 border-gray-200 text-gray-500 hover:text-red-500 cursor-pointer"
                     >
-                      Remove
+                      Gỡ bỏ
                     </Button>
                   ) : (
                     <Button 
@@ -709,7 +709,7 @@ export const CheckoutPage = () => {
                       disabled={isValidatingVoucher || !voucherCode.trim()}
                       className="h-10 bg-gray-800 hover:bg-gray-900 text-white px-5 cursor-pointer disabled:opacity-50"
                     >
-                      {isValidatingVoucher ? <Loader2 size={16} className="animate-spin" /> : 'Apply'}
+                      {isValidatingVoucher ? <Loader2 size={16} className="animate-spin" /> : 'Áp dụng'}
                     </Button>
                   )}
                 </div>
@@ -717,9 +717,9 @@ export const CheckoutPage = () => {
 
               <div className="border-t border-gray-200 mt-4 pt-4">
                 <div className="flex justify-between items-end mb-6">
-                  <span className="text-lg font-bold text-gray-900">Total</span>
+                  <span className="text-lg font-bold text-gray-900">Tổng thanh toán</span>
                   <span className="text-2xl font-black text-[#FF6B00] leading-none">
-                    ${total.toFixed(2)}
+                    {(total * 25400).toLocaleString('vi-VN')}đ
                   </span>
                 </div>
 
@@ -730,17 +730,17 @@ export const CheckoutPage = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 size={18} className="animate-spin" /> Processing...
+                      <Loader2 size={18} className="animate-spin" /> Đang xử lý...
                     </>
                   ) : (
                     <>
-                      <ShieldCheck size={18} /> Place Order
+                      <ShieldCheck size={18} /> Đặt hàng ngay
                     </>
                   )}
                 </Button>
 
                 <p className="text-xs text-gray-400 text-center mt-3">
-                  By placing your order, you agree to our Terms & Conditions
+                  Bằng cách đặt hàng, bạn đồng ý với Điều khoản & Điều kiện của chúng tôi
                 </p>
               </div>
             </div>

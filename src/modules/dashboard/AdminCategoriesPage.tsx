@@ -24,7 +24,7 @@ const AdminCategoriesPage: React.FC = () => {
             const res = await categoryApi.getAll();
             setCategories(res.data.data);
         } catch {
-            message.error('Failed to load categories');
+            message.error('Không thể tải danh mục');
         } finally {
             setLoading(false);
         }
@@ -77,10 +77,10 @@ const AdminCategoriesPage: React.FC = () => {
     const handleDelete = async (id: string) => {
         try {
             await categoryApi.delete(id);
-            message.success('Category deleted successfully');
+            message.success('Đã xóa danh mục thành công');
             fetchCategories();
         } catch {
-            message.error('Failed to delete category');
+            message.error('Không thể xóa danh mục');
         }
     };
 
@@ -100,15 +100,15 @@ const AdminCategoriesPage: React.FC = () => {
             setSaving(true);
             if (editingCategory) {
                 await categoryApi.update(editingCategory._id, payload);
-                message.success('Category updated successfully');
+                message.success('Đã cập nhật danh mục thành công');
             } else {
                 await categoryApi.create(payload);
-                message.success('Category created successfully');
+                message.success('Đã tạo danh mục thành công');
             }
             setModalOpen(false);
             fetchCategories();
         } catch (err: any) {
-            const msg = err?.response?.data?.message ?? err?.message ?? 'Something went wrong';
+            const msg = err?.response?.data?.message ?? err?.message ?? 'Đã có lỗi xảy ra';
             message.error(msg);
         } finally {
             setSaving(false);
@@ -119,12 +119,12 @@ const AdminCategoriesPage: React.FC = () => {
     const beforeUpload = (file: RcFile) => {
         const isImage = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type);
         if (!isImage) {
-            message.error('Only JPEG, PNG, WebP, and GIF images are allowed!');
+            message.error('Chỉ cho phép định dạng JPEG, PNG, WebP và GIF!');
             return Upload.LIST_IGNORE;
         }
         const isLt5M = file.size / 1024 / 1024 < 5;
         if (!isLt5M) {
-            message.error('Image must be smaller than 5MB!');
+            message.error('Kích thước ảnh phải nhỏ hơn 5MB!');
             return Upload.LIST_IGNORE;
         }
         return false; // Return false to prevent auto-upload
@@ -139,7 +139,7 @@ const AdminCategoriesPage: React.FC = () => {
             ),
         },
         {
-            title: 'Category',
+            title: 'Danh mục',
             key: 'category',
             render: (_, record) => (
                 <div className="flex items-center gap-3">
@@ -168,16 +168,16 @@ const AdminCategoriesPage: React.FC = () => {
             ),
         },
         {
-            title: 'Description',
+            title: 'Mô tả',
             dataIndex: 'description',
             render: (desc) => (
                 <span className="text-gray-600 text-sm truncate block max-w-[300px]">
-                    {desc || <span className="text-gray-300 italic">No description</span>}
+                    {desc || <span className="text-gray-300 italic">Không có mô tả</span>}
                 </span>
             ),
         },
         {
-            title: 'Created',
+            title: 'Ngày tạo',
             dataIndex: 'createdAt',
             sorter: (a, b) =>
                 new Date(a.createdAt ?? 0).getTime() - new Date(b.createdAt ?? 0).getTime(),
@@ -188,12 +188,12 @@ const AdminCategoriesPage: React.FC = () => {
             ),
         },
         {
-            title: 'Actions',
+            title: 'Thao tác',
             key: 'actions',
             width: 100,
             render: (_, record) => (
                 <div className="flex items-center gap-2">
-                    <Tooltip title="Edit">
+                    <Tooltip title="Chỉnh sửa">
                         <button
                             id={`edit-category-${record._id}`}
                             onClick={() => openEdit(record)}
@@ -203,15 +203,15 @@ const AdminCategoriesPage: React.FC = () => {
                         </button>
                     </Tooltip>
                     <Popconfirm
-                        title="Delete category"
-                        description="This will permanently delete this category. Products using it won't be affected."
+                        title="Xóa danh mục"
+                        description="Hành động này sẽ xóa vĩnh viễn danh mục này. Các sản phẩm đang sử dụng danh mục này sẽ không bị ảnh hưởng."
                         onConfirm={() => handleDelete(record._id)}
-                        okText="Delete"
-                        cancelText="Cancel"
+                        okText="Xóa"
+                        cancelText="Hủy"
                         okButtonProps={{ danger: true }}
                         placement="topRight"
                     >
-                        <Tooltip title="Delete">
+                        <Tooltip title="Xóa">
                             <button
                                 id={`delete-category-${record._id}`}
                                 className="p-1.5 rounded-lg text-gray-500 cursor-pointer hover:bg-red-50 hover:text-red-500 transition-colors"
@@ -231,11 +231,11 @@ const AdminCategoriesPage: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Category Management</h1>
-                        <p className="text-sm text-gray-400 mt-0.5">{categories.length} categories total</p>
+                        <h1 className="text-2xl font-bold text-gray-800">Quản lý danh mục</h1>
+                        <p className="text-sm text-gray-400 mt-0.5">Tổng cộng {categories.length} danh mục</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Tooltip title="Refresh">
+                        <Tooltip title="Làm mới">
                             <button
                                 onClick={() => fetchCategories()}
                                 className="p-2.5 rounded-xl border border-gray-200 text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -249,7 +249,7 @@ const AdminCategoriesPage: React.FC = () => {
                             className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2.5 rounded-xl font-medium cursor-pointer hover:bg-orange-700 transition-colors shadow-sm"
                         >
                             <Plus size={18} />
-                            Add Category
+                            Thêm danh mục
                         </button>
                     </div>
                 </div>
@@ -259,7 +259,7 @@ const AdminCategoriesPage: React.FC = () => {
                     <Input
                         id="category-search"
                         allowClear
-                        placeholder="Search by name, slug, or description…"
+                        placeholder="Tìm kiếm theo tên, slug hoặc mô tả…"
                         prefix={<Search size={16} className="text-gray-400 mr-1" />}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -278,7 +278,7 @@ const AdminCategoriesPage: React.FC = () => {
                             emptyText: (
                                 <div className="py-16 flex flex-col items-center text-gray-400">
                                     <FolderOpen size={40} className="mb-3 opacity-40" />
-                                    <p>No categories found</p>
+                                    <p>Không tìm thấy danh mục nào</p>
                                 </div>
                             ),
                         }}
@@ -291,14 +291,14 @@ const AdminCategoriesPage: React.FC = () => {
             <Modal
                 title={
                     <span className="text-lg font-bold text-gray-800">
-                        {editingCategory ? 'Edit Category' : 'Add New Category'}
+                        {editingCategory ? 'Chỉnh sửa danh mục' : 'Thêm danh mục mới'}
                     </span>
                 }
                 open={modalOpen}
                 onOk={handleSave}
                 onCancel={() => setModalOpen(false)}
-                okText={editingCategory ? 'Save Changes' : 'Add Category'}
-                cancelText="Cancel"
+                okText={editingCategory ? 'Lưu thay đổi' : 'Thêm danh mục'}
+                cancelText="Hủy"
                 confirmLoading={saving}
                 okButtonProps={{ className: '!bg-orange-600 hover:!bg-orange-700 !border-orange-600 text-white' }}
                 width={500}
@@ -306,28 +306,28 @@ const AdminCategoriesPage: React.FC = () => {
             >
                 <Form form={form} layout="vertical" className="mt-4">
                     <Form.Item
-                        label="Category Name"
+                        label="Tên danh mục"
                         name="name"
                         rules={[
-                            { required: true, message: 'Please enter category name' },
-                            { min: 2, message: 'Min 2 characters' }
+                            { required: true, message: 'Vui lòng nhập tên danh mục' },
+                            { min: 2, message: 'Tối thiểu 2 ký tự' }
                         ]}
                     >
-                        <Input placeholder="e.g. Electronics, Fashion…" className="rounded-lg" />
+                        <Input placeholder="Ví dụ: Điện tử, Thời trang…" className="rounded-lg" />
                     </Form.Item>
 
                     <Form.Item
-                        label="Description"
+                        label="Mô tả"
                         name="description"
                     >
                         <Input.TextArea
                             rows={3}
-                            placeholder="Short description of this category…"
+                            placeholder="Mô tả ngắn gọn về danh mục này…"
                             className="rounded-lg"
                         />
                     </Form.Item>
 
-                    <Form.Item label="Category Image">
+                    <Form.Item label="Hình ảnh danh mục">
                         <Upload
                             listType="picture-card"
                             fileList={fileList}
@@ -339,12 +339,12 @@ const AdminCategoriesPage: React.FC = () => {
                             {fileList.length < 1 && (
                                 <div className="flex flex-col items-center gap-1 text-gray-400">
                                     <ImagePlus size={24} />
-                                    <span className="text-xs">Upload</span>
+                                    <span className="text-xs">Tải lên</span>
                                 </div>
                             )}
                         </Upload>
                         <p className="text-xs text-gray-400 mt-1">
-                            JPEG, PNG, WebP or GIF. Max 5MB.
+                            Định dạng JPEG, PNG, WebP hoặc GIF. Tối đa 5MB.
                         </p>
                     </Form.Item>
                 </Form>

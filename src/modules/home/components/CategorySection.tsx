@@ -6,11 +6,11 @@ const getCategoryIcon = (name: string, slug: string) => {
   const n = name.toLowerCase();
   const s = slug.toLowerCase();
   
-  if (s.includes('electronics') || n.includes('electronics')) return <Laptop className="size-6 text-[#C83B1E]" />;
-  if (s.includes('fashion') || n.includes('fashion')) return <Shirt className="size-6 text-[#C83B1E]" />;
-  if (s.includes('home') || n.includes('home')) return <Home className="size-6 text-[#C83B1E]" />;
-  if (s.includes('beauty') || n.includes('beauty')) return <Sparkles className="size-6 text-[#C83B1E]" />;
-  if (s.includes('flash') || n.includes('flash')) return <Zap className="size-6 text-[#C83B1E] fill-[#C83B1E]" />;
+  if (s.includes('electronics') || n.includes('electronics') || n.includes('điện tử')) return <Laptop className="size-6 text-[#C83B1E]" />;
+  if (s.includes('fashion') || n.includes('fashion') || n.includes('thời trang')) return <Shirt className="size-6 text-[#C83B1E]" />;
+  if (s.includes('home') || n.includes('home') || n.includes('nhà cửa') || n.includes('gia dụng')) return <Home className="size-6 text-[#C83B1E]" />;
+  if (s.includes('beauty') || n.includes('beauty') || n.includes('làm đẹp') || n.includes('mỹ phẩm') || n.includes('nước hoa')) return <Sparkles className="size-6 text-[#C83B1E]" />;
+  if (s.includes('flash') || n.includes('flash') || n.includes('khuyến mãi')) return <Zap className="size-6 text-[#C83B1E] fill-[#C83B1E]" />;
   
   return null;
 };
@@ -69,12 +69,12 @@ export const CategorySection = () => {
   return (
     <section>
       <div className="flex justify-between items-end mb-6">
-        <h2 className="text-xl font-bold">Shop by Category</h2>
+        <h2 className="text-xl font-bold">Danh mục sản phẩm</h2>
         <Link
           to="/categories"
           className="text-[#C83B1E] text-xs font-medium flex items-center hover:underline"
         >
-          View All <ChevronRight className="size-3" />
+          Xem tất cả <ChevronRight className="size-3" />
         </Link>
       </div>
 
@@ -96,7 +96,7 @@ export const CategorySection = () => {
               )}
             </div>
             <h3 className="font-bold text-sm text-gray-900">{cat.name}</h3>
-            <p className="text-[11px] text-gray-400 mt-1">Explore Items</p>
+            <p className="text-[11px] text-gray-400 mt-1">Khám phá ngay</p>
           </Link>
         ))}
       </div>

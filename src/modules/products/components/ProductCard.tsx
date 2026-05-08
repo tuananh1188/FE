@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { useFavorite } from "@/shared/context/FavoriteContext";
 
-export function ProductCard({ id, name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Buy Now", onClick }: ProductCardProps) {
+export function ProductCard({ id, name, images, price, originalPrice, discount, soldPercentage, totalSold, showBuyButton, buttonText = "Mua ngay", onClick }: ProductCardProps) {
     const { isFavorite, toggleFavorite } = useFavorite();
     const isLiked = id ? isFavorite(id) : false;
 
@@ -57,21 +57,21 @@ export function ProductCard({ id, name, images, price, originalPrice, discount, 
                     <div className="flex items-baseline gap-2 truncate">
                         {price && 0 < price && price < originalPrice ? (
                             <>
-                                <span className="text-md text-[#C83B1E] font-bold">${price.toFixed(2)}</span>
-                                <span className="text-[13px] text-gray-400 line-through">${originalPrice.toFixed(2)}</span>
+                                <span className="text-md text-[#C83B1E] font-bold">{(price * 25400).toLocaleString('vi-VN')}đ</span>
+                                <span className="text-[13px] text-gray-400 line-through">{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
                             </>
                         ) : (
-                            <span className="text-md text-[#C83B1E] font-bold">${originalPrice.toFixed(2)}</span>
+                            <span className="text-md text-[#C83B1E] font-bold">{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
                         )}
                     </div>
                     {(!soldPercentage || soldPercentage <= 0) && totalSold !== undefined && (
-                        <span className="text-[12px] text-gray-500 whitespace-nowrap">{totalSold} sold</span>
+                        <span className="text-[12px] text-gray-500 whitespace-nowrap">Đã bán {totalSold}</span>
                     )}
                 </div>
                 {(soldPercentage ?? 0) > 0 && <div className="mt-3 bg-gray-100 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-[#C83B1E] h-full transition-all duration-500" style={{ width: `${soldPercentage}%` }} />
                 </div>}
-                {(soldPercentage ?? 0) > 0 && <p className="text-[10px] text-gray-500 mt-1 font-medium uppercase h-2">{soldPercentage}% sold</p>}
+                {(soldPercentage ?? 0) > 0 && <p className="text-[10px] text-gray-500 mt-1 font-medium uppercase h-2">Đã bán {soldPercentage}%</p>}
                 {showBuyButton && (
                     <Button className="w-full mt-3 bg-[#C83B1E] hover:bg-[#C83B1E]/90 hover:cursor-pointer text-white h-8 text-xs font-semibold">
                         {buttonText}

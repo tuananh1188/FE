@@ -12,12 +12,12 @@ export type UserResponse = {
 };
 
 export const adminUserApi = {
-  getAllUsers: () => http.get<{ success: boolean; data: UserResponse[] }>('/users'),
+  getAllUsers: () => http.get<{ success: boolean; data: UserResponse[] }>('users'),
   updateUserRole: (id: string, role: 'user' | 'admin') =>
-    http.patch<{ success: boolean; data: UserResponse }>(`/users/${id}/role`, { role }),
+    http.patch<{ success: boolean; data: UserResponse }>(`users/${id}/role`, { role }),
   toggleBlockUser: (id: string) =>
-    http.patch<{ success: boolean; message: string; data: UserResponse }>(`/users/${id}/toggle-block`),
+    http.patch<{ success: boolean; message: string; data: UserResponse }>(`users/${id}/toggle-block`),
   deleteUser: (id: string) =>
-    http.delete<{ success: boolean; message: string }>(`/users/${id}`),
+    http.delete<{ success: boolean; message: string }>(`users/${id}`),
 };
 

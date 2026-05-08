@@ -33,15 +33,15 @@ export const DailyDiscoverSection = () => {
     loadProducts();
   }, []);
 
-  if (loading) return <div className='py-20 text-center'>Loading discover...</div>
-  if (error) return <div className='py-20 text-center text-red-500'>Error: {error}</div>
+  if (loading) return <div className='py-20 text-center'>Đang tải sản phẩm...</div>
+  if (error) return <div className='py-20 text-center text-red-500'>Lỗi: {error}</div>
 
   // Show only top 6 on home page as requested
   const displayProducts = products.slice(0, 6);
 
   return (
     <section className="text-center">
-      <h2 className="text-xl font-bold mb-8">Daily Discover</h2>
+      <h2 className="text-xl font-bold mb-8">Gợi ý hôm nay</h2>
       <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-10">
         {displayProducts.map((item, index) => (
           <ProductCard
@@ -57,7 +57,7 @@ export const DailyDiscoverSection = () => {
         ))}
       </div>
       
-      {products.length === 0 && <p className='text-center text-gray-500'>No products found</p>}
+      {products.length === 0 && <p className='text-center text-gray-500'>Không tìm thấy sản phẩm nào</p>}
       
       {products.length > 0 && (
         <Button 
@@ -65,7 +65,7 @@ export const DailyDiscoverSection = () => {
           className="border-[#C83B1E] text-[#C83B1E] hover:bg-red-50 px-10 hover:cursor-pointer"
           onClick={() => navigate('/categories')}
         >
-          View All Discoveries
+          Xem thêm sản phẩm
         </Button>
       )}
 

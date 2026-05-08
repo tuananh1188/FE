@@ -50,7 +50,7 @@ export const AppLayout = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <h1 className="text-[#C83B1E] font-bold text-xl leading-none">
-              The Editorial<br /><span className="text-sm font-light">Marketplace</span>
+              Editorial<br /><span className="text-sm font-light">Sàn thương mại</span>
             </h1>
           </Link>
 
@@ -65,7 +65,7 @@ export const AppLayout = () => {
             className="hidden md:block flex-1 max-w-md relative"
           >
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input name="search" className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Search curated collections..." />
+            <Input name="search" className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Tìm kiếm bộ sưu tập..." />
           </form>
 
           {/* Home Link */}
@@ -79,15 +79,15 @@ export const AppLayout = () => {
             )}
           >
             <Home className="size-4" />
-            <span className="hidden lg:inline">Home</span>
+            <span className="hidden lg:inline">Trang chủ</span>
           </Link>
 
           {/* Nav links */}
           <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-muted-foreground">
-            <Link to="/categories/flash-sale" className="text-[#C83B1E]">Flash Sales</Link>
-            <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Categories</Link>
-            <a href="#" className="hover:text-foreground">Brands</a>
-            <a href="#" className="hover:text-foreground">Vouchers</a>
+            <Link to="/categories/flash-sale" className="text-[#C83B1E]">Khuyến mãi</Link>
+            <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Danh mục</Link>
+            <a href="#" className="hover:text-foreground">Thương hiệu</a>
+            <a href="#" className="hover:text-foreground">Mã giảm giá</a>
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -112,7 +112,7 @@ export const AppLayout = () => {
                   className="hidden sm:inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold bg-orange-50 text-orange-600 hover:bg-orange-100 transition-colors border border-orange-200 shadow-sm"
                 >
                   <LayoutDashboard className="size-4" />
-                  <span>Dashboard</span>
+                  <span>Quản trị</span>
                 </Link>
               )}
               <ThemeToggle />
@@ -126,7 +126,7 @@ export const AppLayout = () => {
                 )}
               >
                 <User className="size-4" />
-                <span className="hidden sm:inline">Profile</span>
+                <span className="hidden sm:inline">Hồ sơ</span>
               </Link>
               <Avatar className="size-8">
                 <AvatarImage src={user?.avatarUrl} alt={user?.email} referrerPolicy="no-referrer" crossOrigin="anonymous" />
@@ -134,7 +134,7 @@ export const AppLayout = () => {
               </Avatar>
               <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-1.5 text-muted-foreground hover:text-foreground px-2">
                 <LogOut className="size-4" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="hidden sm:inline">Đăng xuất</span>
               </Button>
             </div>
           </div>

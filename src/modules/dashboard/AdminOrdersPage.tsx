@@ -15,7 +15,7 @@ export const AdminOrdersPage = () => {
         setOrders(res.data.data);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to fetch orders');
+      toast.error(error?.response?.data?.message || 'Không thể tải danh sách đơn hàng');
     } finally {
       setLoading(false);
     }
@@ -30,11 +30,11 @@ export const AdminOrdersPage = () => {
       const payload = type === 'orderStatus' ? { orderStatus: status } : { paymentStatus: status };
       const res = await orderApi.updateOrderStatus(orderId, payload);
       if (res.data.success) {
-        toast.success(`${type === 'orderStatus' ? 'Order' : 'Payment'} status updated`);
+        toast.success(`Cập nhật trạng thái ${type === 'orderStatus' ? 'đơn hàng' : 'thanh toán'} thành công`);
         setOrders(orders.map(o => o._id === orderId ? { ...o, ...payload } : o));
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to update status');
+      toast.error(error?.response?.data?.message || 'Cập nhật trạng thái thất bại');
     }
   };
 
@@ -73,7 +73,7 @@ export const AdminOrdersPage = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Quản lý đơn hàng</h1>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -81,12 +81,12 @@ export const AdminOrdersPage = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Order ID & Date</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Customer</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Payment</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Order Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Mã đơn & Ngày đặt</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Khách hàng</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tổng tiền</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Thanh toán</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Trạng thái đơn</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -101,8 +101,8 @@ export const AdminOrdersPage = () => {
                     <div className="text-xs text-gray-500">{order.shippingAddress.phone}</div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm font-bold text-gray-900">${order.totalAmount.toFixed(2)}</div>
-                    <div className="text-xs text-gray-500">{order.items.length} item(s)</div>
+                    <div className="text-sm font-bold text-gray-900">{(order.totalAmount * 25400).toLocaleString('vi-VN')}đ</div>
+                    <div className="text-xs text-gray-500">{order.items.length} sản phẩm</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1.5 items-start">
@@ -114,7 +114,7 @@ export const AdminOrdersPage = () => {
                         ) : (
                           <CreditCard size={14} className="text-blue-600" />
                         )}
-                        {order.paymentMethod === 'BANK_TRANSFER' ? 'QR (Bank)' : order.paymentMethod}
+                        {order.paymentMethod === 'BANK_TRANSFER' ? 'Chuyển khoản (QR)' : order.paymentMethod}
                       </span>
 
                       <select 
@@ -122,9 +122,9 @@ export const AdminOrdersPage = () => {
                         onChange={(e) => handleUpdateStatus(order._id, e.target.value, 'paymentStatus')}
                         className={`text-xs font-bold rounded-full px-2 py-0.5 border-none cursor-pointer outline-none ${getStatusColor(order.paymentStatus)}`}
                       >
-                        <option value="PENDING">PENDING</option>
-                        <option value="PAID">PAID</option>
-                        <option value="FAILED">FAILED</option>
+                        <option value="PENDING">CHỜ THANH TOÁN</option>
+                        <option value="PAID">ĐÃ THANH TOÁN</option>
+                        <option value="FAILED">THẤT BẠI</option>
                       </select>
                     </div>
                   </td>
@@ -134,11 +134,11 @@ export const AdminOrdersPage = () => {
                       onChange={(e) => handleUpdateStatus(order._id, e.target.value, 'orderStatus')}
                       className={`text-xs font-bold rounded-full px-2 py-1 flex border-none cursor-pointer outline-none ${getStatusColor(order.orderStatus)}`}
                     >
-                      <option value="PENDING">PENDING</option>
-                      <option value="PROCESSING">PROCESSING</option>
-                      <option value="SHIPPED">SHIPPED</option>
-                      <option value="DELIVERED">DELIVERED</option>
-                      <option value="CANCELLED">CANCELLED</option>
+                      <option value="PENDING">CHỜ XÁC NHẬN</option>
+                      <option value="PROCESSING">ĐANG XỬ LÝ</option>
+                      <option value="SHIPPED">ĐANG GIAO</option>
+                      <option value="DELIVERED">ĐÃ GIAO</option>
+                      <option value="CANCELLED">ĐÃ HỦY</option>
                     </select>
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -151,7 +151,7 @@ export const AdminOrdersPage = () => {
               {orders.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No orders found
+                    Không tìm thấy đơn hàng nào
                   </td>
                 </tr>
               )}

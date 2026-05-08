@@ -18,7 +18,7 @@ export const Breadcrumb = ({ items }: BreadcrumbProps) => {
                 className="flex items-center gap-1 text-gray-500 hover:text-[#C83B1E] transition-colors text-xs font-medium"
             >
                 <Home className="size-3.5" />
-                <span>Home</span>
+                <span>Trang chủ</span>
             </Link>
 
             {items.map((item, index) => {

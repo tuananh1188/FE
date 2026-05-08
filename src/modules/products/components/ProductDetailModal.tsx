@@ -206,7 +206,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-4">
                         <div className="size-10 border-2 border-[#C83B1E] border-t-transparent rounded-full animate-spin" />
-                        <p className="text-gray-500 text-sm font-medium">Loading product details...</p>
+                        <p className="text-gray-500 text-sm font-medium">Đang tải chi tiết sản phẩm...</p>
                     </div>
                 ) : product ? (
                     <>
@@ -218,7 +218,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                 <div className="relative aspect-square bg-gray-50 rounded-xl overflow-hidden mb-3 group">
                                     {hasDiscount && (
                                         <span className="absolute top-3 left-3 bg-[#C83B1E] text-white text-xs font-bold px-2.5 py-1 rounded-lg z-10 shadow-sm">
-                                            SAVE {product.discount}%
+                                            GIẢM {product.discount}%
                                         </span>
                                     )}
                                     <img
@@ -298,10 +298,10 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         ))}
                                         <span className="text-sm font-semibold text-gray-700 ml-1">{rating.toFixed(1)}</span>
                                     </div>
-                                    <span className="text-xs text-gray-400">({reviewCount} Reviews)</span>
+                                    <span className="text-xs text-gray-400">({reviewCount} Đánh giá)</span>
                                     {product.totalSold > 0 && (
                                         <span className="text-xs text-gray-400 border-l border-gray-200 pl-3">
-                                            {product.totalSold.toLocaleString()} sold
+                                            Đã bán {product.totalSold.toLocaleString()}
                                         </span>
                                     )}
                                 </div>
@@ -309,12 +309,12 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                 {/* Price */}
                                 <div className="flex items-baseline gap-3 mb-5">
                                     <span className="text-3xl font-black text-[#C83B1E]">
-                                        ${product.price.toFixed(2)}
+                                        {(product.price * 25400).toLocaleString('vi-VN')}đ
                                     </span>
                                     {hasDiscount && (
                                         <>
                                             <span className="text-lg text-gray-400 line-through font-medium">
-                                                ${product.originalPrice.toFixed(2)}
+                                                {(product.originalPrice * 25400).toLocaleString('vi-VN')}đ
                                             </span>
                                             <span className="text-xs font-bold text-white bg-[#C83B1E] px-2 py-0.5 rounded-md">
                                                 -{product.discount}%
@@ -398,7 +398,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                 {product.stock > 0 && (
                                     <div className="mb-6">
                                         <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">
-                                            Quantity
+                                            Số lượng
                                         </label>
                                         <div className="flex items-center gap-0 border-2 border-gray-100 rounded-xl w-fit overflow-hidden bg-gray-50">
                                             <button
@@ -430,7 +430,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         className="col-span-2 flex items-center justify-center gap-2 bg-[#C83B1E] text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider hover:bg-[#b03318] hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-[#C83B1E]/25 hover:shadow-[#C83B1E]/40"
                                     >
                                         <ShoppingCart size={18} />
-                                        Cart
+                                        Giỏ hàng
                                     </button>
                                     <button
                                         onClick={handleBuyNow}
@@ -438,7 +438,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                         className="col-span-2 flex items-center justify-center gap-2 bg-gray-900 text-white py-4 rounded-2xl font-black text-sm uppercase tracking-wider hover:bg-black hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-gray-900/20 hover:shadow-gray-900/30"
                                     >
                                         <Zap size={18} className="text-amber-400 fill-amber-400" />
-                                        Buy Now
+                                        Mua ngay
                                     </button>
                                     <button
                                         onClick={handleToggleFavorite}
@@ -457,22 +457,22 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                     <div className="flex items-center gap-3">
                                         <Truck size={18} className="text-gray-500 flex-shrink-0" />
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-800">Free Standard Shipping</p>
-                                            <p className="text-xs text-gray-400">Estimated delivery: 3–7 business days</p>
+                                            <p className="text-sm font-semibold text-gray-800">Miễn phí vận chuyển tiêu chuẩn</p>
+                                            <p className="text-xs text-gray-400">Giao hàng dự kiến: 3–7 ngày làm việc</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <RotateCcw size={18} className="text-gray-500 flex-shrink-0" />
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-800">30-Day Easy Returns</p>
-                                            <p className="text-xs text-gray-400">Hassle-free returns and exchanges</p>
+                                            <p className="text-sm font-semibold text-gray-800">Đổi trả trong 30 ngày</p>
+                                            <p className="text-xs text-gray-400">Đổi trả và hoàn tiền dễ dàng</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Shield size={18} className="text-gray-500 flex-shrink-0" />
                                         <div>
-                                            <p className="text-sm font-semibold text-gray-800">Authentic Product</p>
-                                            <p className="text-xs text-gray-400">100% genuine guaranteed</p>
+                                            <p className="text-sm font-semibold text-gray-800">Sản phẩm chính hãng</p>
+                                            <p className="text-xs text-gray-400">Cam kết 100% hàng thật</p>
                                         </div>
                                     </div>
                                 </div>
@@ -507,7 +507,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                                                     </h4>
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-sm font-black text-[#C83B1E]">
-                                                            ${p.price.toFixed(2)}
+                                                            {(p.price * 25400).toLocaleString('vi-VN')}đ
                                                         </span>
                                                         <span className="text-[10px] text-gray-400 font-medium bg-gray-100 px-1.5 py-0.5 rounded">
                                                             {p.category?.name}
@@ -526,7 +526,7 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                     </>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-32 gap-3">
-                        <p className="text-red-500 font-semibold">Product not found</p>
+                        <p className="text-red-500 font-semibold">Không tìm thấy sản phẩm</p>
                     </div>
                 )}
 

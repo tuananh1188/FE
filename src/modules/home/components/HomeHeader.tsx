@@ -6,19 +6,19 @@ export const HomeHeader = () => {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
         <h1 className="text-[#C83B1E] font-bold text-xl leading-none">
-          The Editorial<br /><span className="text-sm font-light">Marketplace</span>
+          Editorial<br /><span className="text-sm font-light">Sàn thương mại</span>
         </h1>
         
         <div className="flex-1 max-w-xl relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" />
-          <Input className="pl-10 bg-gray-50 border-none rounded-full h-9" placeholder="Search curated collections..." />
+          <Input className="pl-10 bg-gray-50 border-none rounded-full h-9" placeholder="Tìm kiếm bộ sưu tập..." />
         </div>
 
         <nav className="hidden md:flex items-center gap-6 text-[13px] font-medium text-gray-600">
-          <a href="#" className="text-[#C83B1E]">Flash Sales</a>
-          <a href="#">Categories</a>
-          <a href="#">Brands</a>
-          <a href="#">Vouchers</a>
+          <a href="#" className="text-[#C83B1E]">Khuyến mãi</a>
+          <a href="#">Danh mục</a>
+          <a href="#">Thương hiệu</a>
+          <a href="#">Mã giảm giá</a>
         </nav>
 
         <div className="flex items-center gap-4">

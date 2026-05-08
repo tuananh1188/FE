@@ -82,8 +82,8 @@ export default function ProductPage() {
     const itemRange = `${itemRangeStart}-${itemRangeEnd}`;
 
     const breadcrumbItems = [
-        { label: 'Categories', href: '/categories' },
-        { label: slug ? (categories.find(c => c.slug === slug)?.name ?? 'Loading...') : 'All Products' },
+        { label: 'Danh mục', href: '/categories' },
+        { label: slug ? (categories.find(c => c.slug === slug)?.name ?? 'Đang tải...') : 'Tất cả sản phẩm' },
     ];
 
     return (
@@ -105,27 +105,27 @@ export default function ProductPage() {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-32 gap-4">
                                 <div className="size-10 border-2 border-[#C83B1E] border-t-transparent rounded-full animate-spin" />
-                                <p className="text-gray-500 text-sm font-medium">Loading products...</p>
+                                <p className="text-gray-500 text-sm font-medium">Đang tải sản phẩm...</p>
                             </div>
                         ) : error ? (
                             <div className="flex flex-col items-center justify-center py-32 gap-3">
-                                <p className="text-red-500 font-semibold">Failed to load products</p>
+                                <p className="text-red-500 font-semibold">Không thể tải sản phẩm</p>
                                 <p className="text-gray-600 text-sm">{error}</p>
                             </div>
                         ) : (
                             <>
                                 <SortHeader
                                     totalItems={products.length}
-                                    categoryName={slug ? (categories.find(c => c.slug === slug)?.name ?? 'Loading...') : 'All Products'}
+                                    categoryName={slug ? (categories.find(c => c.slug === slug)?.name ?? 'Đang tải...') : 'Tất cả sản phẩm'}
                                     currentSort={sortOption}
                                     onSortChange={setSortOption}
                                     itemRange={itemRange}
                                 />
                                 {products.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center py-32 gap-3 text-center">
-                                        <p className="text-2xl font-black text-gray-700">No products found</p>
+                                        <p className="text-2xl font-black text-gray-700">Không tìm thấy sản phẩm nào</p>
                                         <p className="text-gray-600 text-sm">
-                                            There are no products in <span className="text-[#C83B1E]">{slug ? (categories.find(c => c.slug === slug)?.name ?? 'this category') : 'this collection'}</span> matching your criteria.
+                                            Không có sản phẩm nào trong <span className="text-[#C83B1E]">{slug ? (categories.find(c => c.slug === slug)?.name ?? 'danh mục này') : 'bộ sưu tập này'}</span> phù hợp với tiêu chí của bạn.
                                         </p>
                                     </div>
                                 ) : (

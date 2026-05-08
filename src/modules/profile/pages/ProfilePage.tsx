@@ -44,8 +44,8 @@ export const ProfilePage = () => {
   return (
     <div className="space-y-8 pb-10">
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Profile Settings</h1>
-        <p className="text-sm text-muted-foreground mt-1">Manage your personal information and track your orders.</p>
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Cài đặt Tài khoản</h1>
+        <p className="text-sm text-muted-foreground mt-1">Quản lý thông tin cá nhân và theo dõi đơn hàng của bạn.</p>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-12">
@@ -53,7 +53,7 @@ export const ProfilePage = () => {
         <div className="lg:col-span-8 space-y-6">
           <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader className="bg-gray-50/50 border-b">
-              <CardTitle className="text-lg font-bold">Personal Information</CardTitle>
+              <CardTitle className="text-lg font-bold">Thông tin cá nhân</CardTitle>
             </CardHeader>
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row gap-10 items-start">
@@ -64,7 +64,7 @@ export const ProfilePage = () => {
                     onUploadSuccess={(newUrl) => setUser((prev) => prev ? { ...prev, avatarUrl: newUrl } : prev)}
                   />
                   <div className="mt-4 text-center">
-                    <p className="text-sm font-bold text-gray-900">{user?.displayName || 'User'}</p>
+                    <p className="text-sm font-bold text-gray-900">{user?.displayName || 'Người dùng'}</p>
                     <p className="text-xs text-muted-foreground">{user?.email}</p>
                   </div>
                 </div>
@@ -76,8 +76,6 @@ export const ProfilePage = () => {
                         displayName: user.displayName ?? '',
                         bio: user.bio ?? '',
                         phone: user.phone ?? '',
-                        address: user.address ?? '',
-                        city: user.city ?? '',
                       }}
                       onSuccess={fetchUser}
                     />
@@ -92,13 +90,24 @@ export const ProfilePage = () => {
           </Card>
         </div>
 
+        {/* Right column — Order History */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Package className="size-5 text-[#C83B1E]" />
+              Lịch sử mua hàng
+            </h2>
+          </div>
+          <OrderHistory />
+        </div>
+
         {/* Address Book */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="border-none shadow-sm overflow-hidden bg-white">
             <CardHeader className="bg-gray-50/50 border-b">
               <CardTitle className="text-lg font-bold flex items-center gap-2">
                 <MapPin className="size-5 text-[#C83B1E]" />
-                Address Book
+                Sổ địa chỉ
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
@@ -116,23 +125,12 @@ export const ProfilePage = () => {
           </Card>
         </div>
 
-        {/* Right column — Order History */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold flex items-center gap-2">
-              <Package className="size-5 text-[#C83B1E]" />
-              Purchase History
-            </h2>
-          </div>
-          <OrderHistory />
-        </div>
-
         {/* New row or additional column for Favorites */}
         <div className="lg:col-span-12 space-y-6 mt-8">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold flex items-center gap-2">
               <Heart className="size-5 text-[#C83B1E] fill-[#C83B1E]" />
-              Favorite Products
+              Sản phẩm yêu thích
             </h2>
           </div>
           <FavoriteList />

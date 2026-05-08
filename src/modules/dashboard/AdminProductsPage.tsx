@@ -25,7 +25,7 @@ const AdminProductsPage: React.FC = () => {
             const res = await productApi.getAll(search || undefined);
             setProducts(res.data.data);
         } catch {
-            message.error('Failed to load products');
+            message.error('Không thể tải danh sách sản phẩm');
         } finally {
             setLoading(false);
         }
@@ -36,7 +36,7 @@ const AdminProductsPage: React.FC = () => {
             const res = await categoryApi.getAll();
             setCategories(res.data.data);
         } catch {
-            message.error('Failed to load categories');
+            message.error('Không thể tải danh mục');
         }
     }, []);
 
@@ -72,7 +72,7 @@ const AdminProductsPage: React.FC = () => {
         form.setFieldsValue({
             name: product.name,
             description: product.description,
-            originalPrice: product.originalPrice,
+            originalPrice: Math.round(product.originalPrice * 25400),
             discount: product.discount,
             category: product.category?._id,
             stock: product.stock,
@@ -85,10 +85,10 @@ const AdminProductsPage: React.FC = () => {
     const handleDelete = async (id: string) => {
         try {
             await productApi.delete(id);
-            message.success('Product deleted successfully');
+            message.success('Đã xóa sản phẩm thành công');
             fetchProducts(searchQuery);
         } catch {
-            message.error('Failed to delete product');
+            message.error('Không thể xóa sản phẩm');
         }
     };
 
@@ -97,14 +97,16 @@ const AdminProductsPage: React.FC = () => {
             const values = await form.validateFields();
 
             if (fileList.length === 0) {
-                message.error('Please upload at least one image');
+                message.error('Vui lòng tải lên ít nhất một hình ảnh');
                 return;
             }
 
             const formData = new FormData();
             formData.append('name', values.name);
             formData.append('description', values.description);
-            formData.append('originalPrice', String(values.originalPrice));
+            // Convert VND back to USD for database consistency
+            const priceInUsd = values.originalPrice / 25400;
+            formData.append('originalPrice', String(priceInUsd));
             formData.append('discount', String(values.discount ?? 0));
             formData.append('category', values.category);
             formData.append('stock', String(values.stock));
@@ -129,15 +131,15 @@ const AdminProductsPage: React.FC = () => {
             setSaving(true);
             if (editingProduct) {
                 await productApi.update(editingProduct._id, formData);
-                message.success('Product updated successfully');
+                message.success('Đã cập nhật sản phẩm thành công');
             } else {
                 await productApi.create(formData);
-                message.success('Product created successfully');
+                message.success('Đã tạo sản phẩm thành công');
             }
             setModalOpen(false);
             fetchProducts(searchQuery);
         } catch (err: any) {
-            let msg = err?.response?.data?.message ?? err?.message ?? 'Something went wrong';
+            let msg = err?.response?.data?.message ?? err?.message ?? 'Đã có lỗi xảy ra';
             if (err?.response?.data?.errors?.length > 0) {
                 const firstError = err.response.data.errors[0];
                 msg = `${firstError.field}: ${firstError.message}`;
@@ -160,7 +162,7 @@ const AdminProductsPage: React.FC = () => {
             ),
         },
         {
-            title: 'Product',
+            title: 'Sản phẩm',
             key: 'product',
             render: (_, record) => (
                 <div className="flex items-center gap-3">
@@ -182,7 +184,7 @@ const AdminProductsPage: React.FC = () => {
             ),
         },
         {
-            title: 'Category',
+            title: 'Danh mục',
             dataIndex: 'category',
             filters: categories.map((c) => ({ text: c.name, value: c._id })),
             onFilter: (value, record) => record.category?._id === value,
@@ -190,28 +192,28 @@ const AdminProductsPage: React.FC = () => {
                 const name = typeof cat === 'string' ? cat : cat?.name;
                 return (
                     <Tag className="rounded-full border-none px-3 font-medium" color="orange">
-                        {name || 'No Category'}
+                        {name || 'Chưa phân loại'}
                     </Tag>
                 );
             },
         },
         {
-            title: 'Price',
+            title: 'Giá',
             dataIndex: 'price',
             sorter: (a, b) => a.price - b.price,
             render: (price, record) => (
                 <div>
-                    <span className="font-bold text-gray-800">${price?.toFixed(2)}</span>
+                    <span className="font-bold text-gray-800">{(price * 25400).toLocaleString('vi-VN')}đ</span>
                     {record.originalPrice > price && (
                         <span className="ml-2 text-xs text-gray-400 line-through">
-                            ${record.originalPrice?.toFixed(2)}
+                            {(record.originalPrice * 25400).toLocaleString('vi-VN')}đ
                         </span>
                     )}
                 </div>
             ),
         },
         {
-            title: 'Discount',
+            title: 'Giảm giá',
             dataIndex: 'discount',
             sorter: (a, b) => (a.discount ?? 0) - (b.discount ?? 0),
             render: (disc) =>
@@ -222,29 +224,29 @@ const AdminProductsPage: React.FC = () => {
                 ),
         },
         {
-            title: 'Stock',
+            title: 'Kho',
             dataIndex: 'stock',
             sorter: (a, b) => a.stock - b.stock,
             render: (stock) => (
                 <span className={`font-semibold ${stock <= 10 ? 'text-red-500' : 'text-gray-700'}`}>
                     {stock}
-                    {stock <= 10 && <span className="ml-1 text-xs text-red-400">(low)</span>}
+                    {stock <= 10 && <span className="ml-1 text-xs text-red-400">(thấp)</span>}
                 </span>
             ),
         },
         {
-            title: 'Sold',
+            title: 'Đã bán',
             dataIndex: 'totalSold',
             sorter: (a, b) => a.totalSold - b.totalSold,
             render: (v) => <span className="text-gray-600">{(v ?? 0).toLocaleString()}</span>,
         },
         {
-            title: 'Actions',
+            title: 'Thao tác',
             key: 'actions',
             width: 100,
             render: (_, record) => (
                 <div className="flex items-center gap-2">
-                    <Tooltip title="Edit">
+                    <Tooltip title="Chỉnh sửa">
                         <button
                             id={`edit-product-${record._id}`}
                             onClick={() => openEdit(record)}
@@ -254,15 +256,15 @@ const AdminProductsPage: React.FC = () => {
                         </button>
                     </Tooltip>
                     <Popconfirm
-                        title="Delete product"
-                        description="This action cannot be undone."
+                        title="Xóa sản phẩm"
+                        description="Hành động này không thể hoàn tác."
                         onConfirm={() => handleDelete(record._id)}
-                        okText="Delete"
-                        cancelText="Cancel"
+                        okText="Xóa"
+                        cancelText="Hủy"
                         okButtonProps={{ danger: true }}
                         placement="topRight"
                     >
-                        <Tooltip title="Delete">
+                        <Tooltip title="Xóa">
                             <button
                                 id={`delete-product-${record._id}`}
                                 className="p-1.5 rounded-lg text-gray-500 cursor-pointer hover:bg-red-50 hover:text-red-500 transition-colors"
@@ -282,11 +284,11 @@ const AdminProductsPage: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-800">Product Management</h1>
-                        <p className="text-sm text-gray-400 mt-0.5">{products.length} products total</p>
+                        <h1 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h1>
+                        <p className="text-sm text-gray-400 mt-0.5">Tổng cộng {products.length} sản phẩm</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Tooltip title="Refresh">
+                        <Tooltip title="Làm mới">
                             <button
                                 onClick={() => fetchProducts(searchQuery)}
                                 className="p-2.5 rounded-xl border border-gray-200 text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -300,7 +302,7 @@ const AdminProductsPage: React.FC = () => {
                             className="flex items-center gap-2 bg-orange-600 text-white px-4 py-2.5 rounded-xl font-medium cursor-pointer hover:bg-orange-700 transition-colors shadow-sm"
                         >
                             <Plus size={18} />
-                            Add Product
+                            Thêm sản phẩm
                         </button>
                     </div>
                 </div>
@@ -310,7 +312,7 @@ const AdminProductsPage: React.FC = () => {
                     <Input
                         id="product-search"
                         allowClear
-                        placeholder="Search by name or description…"
+                        placeholder="Tìm kiếm theo tên hoặc mô tả…"
                         prefix={<Search size={16} className="text-gray-400 mr-1" />}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -329,7 +331,7 @@ const AdminProductsPage: React.FC = () => {
                             emptyText: (
                                 <div className="py-16 flex flex-col items-center text-gray-400">
                                     <PackageOpen size={40} className="mb-3 opacity-40" />
-                                    <p>No products found</p>
+                                    <p>Không tìm thấy sản phẩm nào</p>
                                 </div>
                             ),
                         }}
@@ -342,14 +344,14 @@ const AdminProductsPage: React.FC = () => {
             <Modal
                 title={
                     <span className="text-lg font-bold text-gray-800">
-                        {editingProduct ? 'Edit Product' : 'Add New Product'}
+                        {editingProduct ? 'Chỉnh sửa sản phẩm' : 'Thêm sản phẩm mới'}
                     </span>
                 }
                 open={modalOpen}
                 onOk={handleSave}
                 onCancel={() => setModalOpen(false)}
-                okText={editingProduct ? 'Save Changes' : 'Add Product'}
-                cancelText="Cancel"
+                okText={editingProduct ? 'Lưu thay đổi' : 'Thêm sản phẩm'}
+                cancelText="Hủy"
                 confirmLoading={saving}
                 okButtonProps={{ className: '!bg-orange-600 hover:!bg-orange-700 !border-orange-600 text-white' }}
                 width={600}
@@ -357,35 +359,35 @@ const AdminProductsPage: React.FC = () => {
             >
                 <Form form={form} layout="vertical" className="mt-4">
                     <Form.Item
-                        label="Product Name"
+                        label="Tên sản phẩm"
                         name="name"
                         rules={[
-                            { required: true, message: 'Please enter product name' },
-                            { min: 3, message: 'Min 3 characters' }
+                            { required: true, message: 'Vui lòng nhập tên sản phẩm' },
+                            { min: 3, message: 'Tối thiểu 3 ký tự' }
                         ]}
                     >
-                        <Input placeholder="e.g. UltraBoost Speed Runner" className="rounded-lg" />
+                        <Input placeholder="Ví dụ: UltraBoost Speed Runner" className="rounded-lg" />
                     </Form.Item>
 
                     <Form.Item
-                        label="Description"
+                        label="Mô tả"
                         name="description"
                         rules={[
-                            { required: true, message: 'Please enter description' },
-                            { min: 10, message: 'Min 10 characters' }
+                            { required: true, message: 'Vui lòng nhập mô tả' },
+                            { min: 10, message: 'Tối thiểu 10 ký tự' }
                         ]}
                     >
                         <Input.TextArea
                             rows={2}
-                            placeholder="Short product description…"
+                            placeholder="Mô tả ngắn gọn về sản phẩm…"
                             className="rounded-lg"
                         />
                     </Form.Item>
 
                     <Form.Item
-                        label="Product Images"
+                        label="Hình ảnh sản phẩm"
                         required
-                        tooltip="Upload images from your computer"
+                        tooltip="Tải ảnh lên từ máy tính của bạn"
                     >
                         <Upload
                             listType="picture-card"
@@ -402,7 +404,7 @@ const AdminProductsPage: React.FC = () => {
                             {fileList.length < 5 && (
                                 <div className="flex flex-col items-center">
                                     <UploadCloud size={20} className="text-gray-400 mb-1" />
-                                    <div className="text-[10px] text-gray-500">Upload</div>
+                                    <div className="text-[10px] text-gray-500">Tải lên</div>
                                 </div>
                             )}
                         </Upload>
@@ -410,33 +412,41 @@ const AdminProductsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <Form.Item
-                            label="Original Price ($)"
+                            label="Giá gốc (đ)"
                             name="originalPrice"
-                            rules={[{ required: true, message: 'Required' }]}
+                            rules={[{ required: true, message: 'Bắt buộc' }]}
                         >
-                            <InputNumber min={0} step={0.01} prefix="$" style={{ width: '100%' }} className="rounded-lg" />
+                            <InputNumber 
+                                min={0} 
+                                step={1000} 
+                                suffix="đ" 
+                                style={{ width: '100%' }} 
+                                className="rounded-lg"
+                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                                parser={(value) => value!.replace(/\./g, '')}
+                            />
                         </Form.Item>
 
-                        <Form.Item label="Discount (%)" name="discount" initialValue={0}>
+                        <Form.Item label="Giảm giá (%)" name="discount" initialValue={0}>
                             <InputNumber min={0} max={100} suffix="%" style={{ width: '100%' }} className="rounded-lg" />
                         </Form.Item>
 
                         <Form.Item
-                            label="Category"
+                            label="Danh mục"
                             name="category"
-                            rules={[{ required: true, message: 'Please select a category' }]}
+                            rules={[{ required: true, message: 'Vui lòng chọn danh mục' }]}
                         >
                             <Select
-                                placeholder="Select category"
+                                placeholder="Chọn danh mục"
                                 style={{ width: '100%' }}
                                 options={categories.map((c) => ({ label: c.name, value: c._id }))}
                             />
                         </Form.Item>
 
                         <Form.Item
-                            label="Stock"
+                            label="Số lượng trong kho"
                             name="stock"
-                            rules={[{ required: true, message: 'Required' }]}
+                            rules={[{ required: true, message: 'Bắt buộc' }]}
                             initialValue={0}
                         >
                             <InputNumber min={0} style={{ width: '100%' }} className="rounded-lg" />
@@ -445,14 +455,14 @@ const AdminProductsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                         <Form.Item
-                            label="Available Sizes"
+                            label="Kích cỡ hiện có"
                             name="sizes"
-                            tooltip="Select sizes or type new ones"
+                            tooltip="Chọn kích cỡ hoặc nhập mới"
                         >
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Select or add sizes..."
+                                placeholder="Chọn hoặc thêm kích cỡ..."
                                 className="rounded-lg"
                                 options={[
                                     { value: 'S', label: 'S' },
@@ -465,22 +475,22 @@ const AdminProductsPage: React.FC = () => {
                         </Form.Item>
 
                         <Form.Item
-                            label="Available Colors"
+                            label="Màu sắc hiện có"
                             name="colors"
-                            tooltip="Select colors or type new ones"
+                            tooltip="Chọn màu sắc hoặc nhập mới"
                         >
                             <Select
                                 mode="tags"
                                 style={{ width: '100%' }}
-                                placeholder="Select or add colors..."
+                                placeholder="Chọn hoặc thêm màu sắc..."
                                 className="rounded-lg"
                                 options={[
-                                    { value: 'Red', label: 'Red' },
-                                    { value: 'Blue', label: 'Blue' },
-                                    { value: 'White', label: 'White' },
-                                    { value: 'Black', label: 'Black' },
-                                    { value: 'Green', label: 'Green' },
-                                    { value: 'Yellow', label: 'Yellow' },
+                                    { value: 'Red', label: 'Đỏ' },
+                                    { value: 'Blue', label: 'Xanh dương' },
+                                    { value: 'White', label: 'Trắng' },
+                                    { value: 'Black', label: 'Đen' },
+                                    { value: 'Green', label: 'Xanh lá' },
+                                    { value: 'Yellow', label: 'Vàng' },
                                 ]}
                             />
                         </Form.Item>

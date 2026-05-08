@@ -17,7 +17,7 @@ const DashboardPage: React.FC = () => {
                     setStats(res.data.data);
                 }
             } catch (error: any) {
-                toast.error("Failed to fetch dashboard statistics");
+                toast.error("Không thể tải thống kê bảng điều khiển");
             } finally {
                 setLoading(false);
             }
@@ -37,28 +37,28 @@ const DashboardPage: React.FC = () => {
         <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <StatCard
-                    title="Total Revenue"
-                    value={`$${(stats?.totalRevenue || 0).toLocaleString()}`}
+                    title="Tổng doanh thu"
+                    value={`${((stats?.totalRevenue || 0) * 25400).toLocaleString('vi-VN')}đ`}
                     trend="+12.5%"
                     isPositive={true}
                     icon={<DollarSign size={20} className="text-orange-600" />}
                 />
                 <StatCard
-                    title="Total Orders"
+                    title="Tổng đơn hàng"
                     value={stats?.totalOrders.toString() || '0'}
                     trend="+8.2%"
                     isPositive={true}
                     icon={<ShoppingCart size={20} className="text-orange-600" />}
                 />
                 <StatCard
-                    title="Total Users"
+                    title="Tổng người dùng"
                     value={stats?.totalUsers.toString() || '0'}
                     trend="+5.1%"
                     isPositive={true}
                     icon={<Users size={20} className="text-orange-600" />}
                 />
                 <StatCard
-                    title="Conversion Rate"
+                    title="Tỷ lệ chuyển đổi"
                     value="3.2%"
                     trend="+2.1%"
                     isPositive={true}

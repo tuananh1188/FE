@@ -17,7 +17,7 @@ export const AdminUsersPage = () => {
         setUsers(res.data.data);
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to fetch users');
+      toast.error(error?.response?.data?.message || 'Không thể tải danh sách người dùng');
     } finally {
       setLoading(false);
     }
@@ -32,11 +32,11 @@ export const AdminUsersPage = () => {
     try {
       const res = await adminUserApi.updateUserRole(userId, newRole);
       if (res.data.success) {
-        toast.success(`User role updated to ${newRole}`);
+        toast.success(`Đã cập nhật quyền hạn người dùng thành ${newRole === 'admin' ? 'Quản trị viên' : 'Người dùng'}`);
         setUsers(users.map(u => u._id === userId ? { ...u, role: newRole } : u));
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to update role');
+      toast.error(error?.response?.data?.message || 'Cập nhật quyền hạn thất bại');
     }
   };
 
@@ -44,24 +44,24 @@ export const AdminUsersPage = () => {
     try {
       const res = await adminUserApi.toggleBlockUser(userId);
       if (res.data.success) {
-        toast.success(res.data.message);
+        toast.success(res.data.message === 'User blocked' ? 'Đã chặn người dùng' : 'Đã bỏ chặn người dùng');
         setUsers(users.map(u => u._id === userId ? { ...u, isBlocked: !u.isBlocked } : u));
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to toggle block status');
+      toast.error(error?.response?.data?.message || 'Cập nhật trạng thái thất bại');
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+    if (!window.confirm('Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác.')) return;
     try {
       const res = await adminUserApi.deleteUser(userId);
       if (res.data.success) {
-        toast.success(res.data.message);
+        toast.success('Đã xóa người dùng thành công');
         setUsers(users.filter(u => u._id !== userId));
       }
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Failed to delete user');
+      toast.error(error?.response?.data?.message || 'Xóa người dùng thất bại');
     }
   };
 
@@ -77,7 +77,7 @@ export const AdminUsersPage = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Quản lý người dùng</h1>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -85,19 +85,19 @@ export const AdminUsersPage = () => {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-100">
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Joined</th>
-                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Người dùng</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Liên hệ</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Quyền hạn</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Ngày tham gia</th>
+                <th className="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {users.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-semibold text-gray-900">{user.displayName || 'No Name'}</div>
+                    <div className="font-semibold text-gray-900">{user.displayName || 'Không có tên'}</div>
                     <div className="text-sm text-gray-500">{user.email}</div>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-600">
@@ -107,16 +107,16 @@ export const AdminUsersPage = () => {
                     <div className="flex flex-col gap-1">
                       {user.isBlocked ? (
                         <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-red-100 text-red-700 w-fit flex items-center gap-1">
-                          <Lock size={10} /> Blocked
+                          <Lock size={10} /> Đã chặn
                         </span>
                       ) : (
                         <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-green-100 text-green-700 w-fit flex items-center gap-1">
-                          <ShieldCheck size={10} /> Active
+                          <ShieldCheck size={10} /> Đang hoạt động
                         </span>
                       )}
                       {!user.isEmailVerified && (
                         <span className="px-2.5 py-1 rounded-full text-[10px] uppercase tracking-wider font-black bg-yellow-100 text-yellow-700 w-fit">
-                          Unverified
+                          Chưa xác thực
                         </span>
                       )}
                     </div>
@@ -124,7 +124,7 @@ export const AdminUsersPage = () => {
                   <td className="px-6 py-4">
                     <span className={`flex items-center gap-1.5 text-sm font-bold ${user.role === 'admin' ? 'text-purple-600' : 'text-gray-600'}`}>
                       {user.role === 'admin' ? <ShieldCheck size={16} /> : <User size={16} />}
-                      {user.role.toUpperCase()}
+                      {user.role === 'admin' ? 'QUẢN TRỊ' : 'NGƯỜI DÙNG'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 font-medium">
@@ -138,7 +138,7 @@ export const AdminUsersPage = () => {
                         onClick={() => handleToggleRole(user._id, user.role)}
                         className={`h-9 rounded-lg font-bold text-xs border-2 transition-all ${user.role === 'admin' ? 'text-gray-500 border-gray-100 hover:bg-gray-50' : 'text-purple-600 border-purple-100 hover:bg-purple-50 hover:border-purple-200'}`}
                       >
-                        {user.role === 'admin' ? 'Revoke Admin' : 'Make Admin'}
+                        {user.role === 'admin' ? 'Gỡ quyền Admin' : 'Cấp quyền Admin'}
                       </Button>
                       
                       {user.role !== 'admin' && (
@@ -148,7 +148,7 @@ export const AdminUsersPage = () => {
                             size="sm"
                             onClick={() => handleToggleBlock(user._id)}
                             className={`h-9 px-3 rounded-lg font-bold border-2 transition-all ${user.isBlocked ? 'text-green-600 border-green-100 hover:bg-green-50 hover:border-green-200' : 'text-red-500 border-red-50/50 hover:bg-red-50 hover:border-red-100'}`}
-                            title={user.isBlocked ? 'Unlock this user' : 'Block this user'}
+                            title={user.isBlocked ? 'Bỏ chặn người dùng này' : 'Chặn người dùng này'}
                           >
                             {user.isBlocked ? <Unlock size={16} /> : <Lock size={16} />}
                           </Button>
@@ -158,7 +158,7 @@ export const AdminUsersPage = () => {
                             size="sm"
                             onClick={() => handleDeleteUser(user._id)}
                             className="h-9 px-3 rounded-lg text-gray-400 border-gray-100 hover:text-red-600 hover:bg-red-50 hover:border-red-100 transition-all border-2"
-                            title="Delete user"
+                            title="Xóa người dùng"
                           >
                             <Trash2 size={16} />
                           </Button>
@@ -171,7 +171,7 @@ export const AdminUsersPage = () => {
               {users.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No users found
+                    Không tìm thấy người dùng nào
                   </td>
                 </tr>
               )}

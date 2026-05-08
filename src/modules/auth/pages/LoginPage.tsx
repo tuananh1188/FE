@@ -14,8 +14,8 @@ import { Label } from '@/shared/components/ui/label';
 import { OtpInput } from '@/shared/components/ui/otp-input';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Invalid email'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().min(1, 'Vui lòng nhập Email').email('Email không hợp lệ'),
+  password: z.string().min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
 
 type FormValues = z.infer<typeof loginSchema>;
@@ -40,28 +40,28 @@ export const LoginPage = () => {
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
           if (payload.role === 'admin') {
-            toast.success('Welcome Admin!');
+            toast.success('Chào mừng Quản trị viên!');
             navigate('/admin');
             return;
           }
         } catch (e) {
           // Fallback if token is unparseable
         }
-        toast.success('Logged in successfully.');
+        toast.success('Đăng nhập thành công.');
         navigate('/');
         return;
       }
       setEmail(values.email);
       setStep('verify');
-      toast.success('OTP has been sent to your email.');
+      toast.success('Mã OTP đã được gửi đến email của bạn.');
     } catch (error: any) {
       const requiresOtp = Boolean(error?.response?.data?.requiresOtp);
       if (requiresOtp) {
         setEmail(error.response.data.email ?? values.email);
         setStep('verify');
-        toast.info('OTP required. Check your email.');
+        toast.info('Vui lòng nhập mã OTP. Kiểm tra email của bạn.');
       } else {
-        toast.error(error?.response?.data?.message ?? 'Something went wrong');
+        toast.error(error?.response?.data?.message ?? 'Đã có lỗi xảy ra');
       }
     } finally {
       setLoading(false);
@@ -79,17 +79,17 @@ export const LoginPage = () => {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.role === 'admin') {
-          toast.success('Welcome Admin!');
+          toast.success('Chào mừng Quản trị viên!');
           navigate('/admin');
           return;
         }
       } catch (e) {
         // Fallback
       }
-      toast.success('Logged in successfully.');
+      toast.success('Đăng nhập thành công.');
       navigate('/');
     } catch (error: any) {
-      toast.error(error?.response?.data?.message ?? 'Invalid OTP');
+      toast.error(error?.response?.data?.message ?? 'Mã OTP không hợp lệ');
       setOtp('');
     } finally {
       setLoading(false);
@@ -100,9 +100,9 @@ export const LoginPage = () => {
     return (
       <Card>
         <CardHeader className="text-center">
-          <CardTitle>Verify OTP</CardTitle>
+          <CardTitle>Xác thực OTP</CardTitle>
           <CardDescription>
-            Enter the 6-digit code sent to <span className="font-medium text-foreground">{email}</span>
+            Nhập mã 6 chữ số đã được gửi đến <span className="font-medium text-foreground">{email}</span>
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -110,14 +110,14 @@ export const LoginPage = () => {
             <OtpInput value={otp} onChange={setOtp} />
             <Button className="w-full" type="submit" disabled={otp.length !== 6 || loading}>
               {loading && <Loader2 className="size-4 animate-spin" />}
-              Verify and Login
+              Xác nhận và Đăng nhập
             </Button>
             <button
               type="button"
               onClick={() => { setStep('login'); setOtp(''); }}
               className="block w-full text-center text-sm text-muted-foreground transition hover:text-foreground"
             >
-              Back to login
+              Quay lại đăng nhập
             </button>
           </form>
         </CardContent>
@@ -128,8 +128,8 @@ export const LoginPage = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Enter your account details to continue.</CardDescription>
+        <CardTitle>Chào mừng trở lại</CardTitle>
+        <CardDescription>Nhập thông tin tài khoản để tiếp tục.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={onLoginSubmit}>
@@ -137,23 +137,23 @@ export const LoginPage = () => {
             <Label htmlFor="email">Email</Label>
             <div className="relative">
               <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="email" className="pl-9" placeholder="name@example.com" autoComplete="email" {...register('email')} />
+              <Input id="email" className="pl-9" placeholder="ten@vidu.com" autoComplete="email" {...register('email')} />
             </div>
             {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">Mật khẩu</Label>
             <div className="relative">
               <KeyRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input id="password" className="pl-9" type="password" placeholder="Enter your password" autoComplete="current-password" {...register('password')} />
+              <Input id="password" className="pl-9" type="password" placeholder="Nhập mật khẩu của bạn" autoComplete="current-password" {...register('password')} />
             </div>
             {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
           </div>
 
           <Button className="w-full" type="submit" disabled={loading}>
             {loading && <Loader2 className="size-4 animate-spin" />}
-            Continue to OTP
+            Tiếp tục để nhận mã OTP
           </Button>
         </form>
       </CardContent>
