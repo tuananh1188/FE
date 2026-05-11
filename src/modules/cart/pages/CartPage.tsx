@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Link } from 'react-router-dom';
 import { useCart } from '@/shared/context/CartContext';
 import { CartItemCard } from '../components/CartItemCard';

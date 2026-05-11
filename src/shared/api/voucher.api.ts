@@ -27,5 +27,5 @@ export const voucherApi = {
         http.put<{ success: boolean; data: Voucher }>(`vouchers/update/${id}`, payload),
 
     delete: (id: string) =>
-        http.delete<{ success: boolean }>(`vouchers/delete/${id}`),
+        http.delete<{ success: boolean; message?: string }>(`vouchers/delete/${id}`),
 };

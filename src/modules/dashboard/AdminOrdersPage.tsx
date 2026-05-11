@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { orderApi, type OrderAPIResponse } from '@/shared/api/order.api';
 import { toast } from 'sonner';
-import { Loader2, Eye, Truck, CheckCircle2, Clock, XCircle, CreditCard, Banknote } from 'lucide-react';
+import { Loader2, Eye, CheckCircle2, CreditCard, Banknote } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 
 export const AdminOrdersPage = () => {
@@ -31,7 +31,7 @@ export const AdminOrdersPage = () => {
       const res = await orderApi.updateOrderStatus(orderId, payload);
       if (res.data.success) {
         toast.success(`Cập nhật trạng thái ${type === 'orderStatus' ? 'đơn hàng' : 'thanh toán'} thành công`);
-        setOrders(orders.map(o => o._id === orderId ? { ...o, ...payload } : o));
+        setOrders(orders.map(o => o._id === orderId ? { ...o, ...payload } as OrderAPIResponse : o));
       }
     } catch (error: any) {
       toast.error(error?.response?.data?.message || 'Cập nhật trạng thái thất bại');
@@ -51,16 +51,7 @@ export const AdminOrdersPage = () => {
     }
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'PENDING': return <Clock size={14} className="mr-1" />;
-      case 'PROCESSING': return <Loader2 size={14} className="mr-1 animate-spin" />;
-      case 'SHIPPED': return <Truck size={14} className="mr-1" />;
-      case 'DELIVERED': return <CheckCircle2 size={14} className="mr-1" />;
-      case 'CANCELLED': return <XCircle size={14} className="mr-1" />;
-      default: return null;
-    }
-  };
+
 
   if (loading) {
     return (

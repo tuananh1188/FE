@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { orderApi, type OrderAPIResponse } from '@/shared/api/order.api';
-import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/shared/components/ui/card';
 import { Badge } from '@/shared/components/ui/badge';
 import { Package, Clock, Truck, CheckCircle2, XCircle } from 'lucide-react';
 

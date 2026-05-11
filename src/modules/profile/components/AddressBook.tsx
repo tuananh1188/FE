@@ -29,8 +29,6 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   
   const [provinces, setProvinces] = useState<any[]>([]);
-  const [districts, setDistricts] = useState<any[]>([]);
-  const [wards, setWards] = useState<any[]>([]);
  
   const [form, setForm] = useState({
     label: 'Nhà riêng',
@@ -377,7 +375,7 @@ export const AddressBook = ({ addresses, onUpdate }: AddressBookProps) => {
               <MapPin className="size-10 text-gray-300 mx-auto mb-3" />
               <p className="text-sm text-gray-500">Sổ địa chỉ của bạn đang trống.</p>
               <Button 
-                variant="link" 
+                variant="ghost" 
                 onClick={() => setIsAdding(true)}
                 className="text-[#C83B1E] font-bold"
               >

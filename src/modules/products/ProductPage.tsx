@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { productApi, type Product } from '@/modules/dashboard/api/product.api';
 import { categoryApi, type Category } from '@/shared/api/category.api';

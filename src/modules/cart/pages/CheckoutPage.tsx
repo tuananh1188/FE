@@ -42,7 +42,7 @@ export const CheckoutPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [userAddresses, setUserAddresses] = useState<any[]>([]);
-  const [showAddressBook, setShowAddressBook] = useState(false);
+
 
 
   // Voucher states
@@ -139,7 +139,6 @@ export const CheckoutPage = () => {
       address: `${addr.detail}, ${addr.ward}, ${addr.province}`,
       city: addr.province,
     });
-    setShowAddressBook(false);
     toast.success(`Đã chọn địa chỉ: ${addr.label}`);
   };
 

@@ -28,7 +28,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
     const navigate = useNavigate();
     const [displayImage, setDisplayImage] = useState<string>('/products/electronics.png');
     const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-    const [loadingRelated, setLoadingRelated] = useState(false);
     const [currentId, setCurrentId] = useState<string | null>(productId);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
@@ -69,7 +68,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                     setIsDescriptionExpanded(false);
 
                     // Fetch related products
-                    setLoadingRelated(true);
                     const relatedRes = await productApi.getRelatedProducts(currentId);
                     if (relatedRes.data.success) {
                         setRelatedProducts(relatedRes.data.data);
@@ -79,7 +77,6 @@ export function ProductDetailModal({ productId, onClose }: ProductDetailModalPro
                 console.error('Failed to load product details:', err);
             } finally {
                 setLoading(false);
-                setLoadingRelated(false);
             }
         };
         fetchProduct();

@@ -9,7 +9,7 @@ interface FilterSideBarProps {
     onPriceChange: (min: number, max: number) => void;
 }
 
-export const FilterSideBar = ({ minPrice, maxPrice, onPriceChange }: FilterSideBarProps) => {
+export const FilterSideBar = ({ minPrice: _minPrice, maxPrice, onPriceChange }: FilterSideBarProps) => {
     const navigate = useNavigate();
     const { slug } = useParams();
     const [categories, setCategories] = useState<Category[]>([]);

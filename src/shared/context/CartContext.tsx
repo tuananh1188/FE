@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import type { Product } from '@/modules/dashboard/api/product.api';
 import { cartApi } from '../api/cart.api';
 import { tokenStore } from '@/modules/auth/store/token.store';

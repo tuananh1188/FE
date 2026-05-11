@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Minus, Plus, Trash2, X, Check } from 'lucide-react';
 import type { CartItem } from '@/shared/context/CartContext';
 import { useCart } from '@/shared/context/CartContext';

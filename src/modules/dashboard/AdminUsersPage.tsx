@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { adminUserApi } from './api/user.api';
 import type { UserResponse } from './api/user.api';
 import { toast } from 'sonner';
-import { Loader2, ShieldAlert, ShieldCheck, Lock, Unlock, Trash2, User, ChevronRight } from 'lucide-react';
+import { Loader2, ShieldCheck, Lock, Unlock, Trash2, User } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
 
 

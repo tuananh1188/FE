@@ -4,6 +4,7 @@ import {
     Popconfirm, message, Tooltip, Select, Spin, Upload
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
+import type { ColumnsType } from 'antd/es/table';
 import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw, UploadCloud } from 'lucide-react';
 import { productApi, type Product } from './api/product.api';
 import { categoryApi, type Category } from '../../shared/api/category.api';
@@ -417,13 +418,13 @@ const AdminProductsPage: React.FC = () => {
                             rules={[{ required: true, message: 'Bắt buộc' }]}
                         >
                             <InputNumber 
-                                min={0} 
+                                min={0 as number} 
                                 step={1000} 
                                 suffix="đ" 
                                 style={{ width: '100%' }} 
                                 className="rounded-lg"
                                 formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
-                                parser={(value) => value!.replace(/\./g, '')}
+                                parser={(value) => Number(value!.replace(/\./g, ''))}
                             />
                         </Form.Item>
 

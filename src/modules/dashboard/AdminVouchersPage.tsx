@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Ticket, Calendar, DollarSign, Users, CheckCircle2, XCircle, Edit } from 'lucide-react';
+import { Plus, Trash2, Ticket, CheckCircle2, XCircle, Edit } from 'lucide-react';
 import { voucherApi, type Voucher } from '@/shared/api/voucher.api';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+
 import { useCart } from '@/shared/context/CartContext';
 import { Button } from '@/shared/components/ui/button';
 import { ArrowRight, CreditCard, Wallet, Banknote } from 'lucide-react';

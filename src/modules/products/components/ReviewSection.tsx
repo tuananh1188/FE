@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Star, MessageSquare, Send, User, Loader2, AlertCircle, ThumbsUp, CheckCircle2, Image as ImageIcon, X } from 'lucide-react';
+import { Star, MessageSquare, Send, Loader2, AlertCircle, ThumbsUp, CheckCircle2, Image as ImageIcon, X } from 'lucide-react';
 import { reviewApi, type Review } from '../api/review.api';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
