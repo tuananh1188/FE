@@ -16,7 +16,7 @@ export const HomeHeader = () => {
 
         <nav className="hidden md:flex items-center gap-6 text-[13px] font-medium text-gray-600">
           <a href="#" className="text-[#C83B1E]">Khuyến mãi</a>
-          <a href="#">Danh mục</a>
+          <a href="#">Sản phẩm</a>
           <a href="#">Thương hiệu</a>
           <a href="#">Mã giảm giá</a>
         </nav>

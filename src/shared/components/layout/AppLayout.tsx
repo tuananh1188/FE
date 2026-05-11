@@ -85,7 +85,7 @@ export const AppLayout = () => {
           {/* Nav links */}
           <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-muted-foreground">
             <Link to="/categories/flash-sale" className="text-[#C83B1E]">Khuyến mãi</Link>
-            <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Danh mục</Link>
+            <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Sản phẩm</Link>
             <a href="#" className="hover:text-foreground">Thương hiệu</a>
             <a href="#" className="hover:text-foreground">Mã giảm giá</a>
           </nav>
