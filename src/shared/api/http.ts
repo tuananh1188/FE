@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { tokenStore } from '../../modules/auth/store/token.store';
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5003/api';
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://tuananh-be.vercel.app/api';
 
 export const http = axios.create({
   baseURL: apiBaseUrl,
