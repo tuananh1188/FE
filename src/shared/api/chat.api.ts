@@ -7,5 +7,5 @@ export interface ChatHistoryEntry {
 
 export const chatApi = {
     sendMessage: (message: string, history: ChatHistoryEntry[]) =>
-        http.post<{ success: boolean; text: string }>('/chat', { message, history }),
+        http.post<{ success: boolean; text: string; products?: any[] }>('/chat', { message, history }),
 };
