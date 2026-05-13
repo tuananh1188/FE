@@ -20,6 +20,7 @@ import { CartProvider } from '@/shared/context/CartContext';
 import { FavoriteProvider } from '@/shared/context/FavoriteContext';
 import { CartPage } from '@/modules/cart/pages/CartPage';
 import { CheckoutPage } from '@/modules/cart/pages/CheckoutPage';
+import { VouchersPage } from '@/modules/vouchers/VouchersPage';
 
 function App() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/categories/:slug" element={<ProductPage />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/vouchers" element={<VouchersPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

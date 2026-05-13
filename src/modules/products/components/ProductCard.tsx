@@ -52,28 +52,28 @@ export function ProductCard({ id, name, images, price, originalPrice, discount, 
                 />
             </div>
             <CardContent className="p-3">
-                <h4 className="text-[15px] font-semibold truncate">{name}</h4>
-                <div className="mt-1 flex items-center justify-between gap-1">
+                <h4 className="text-[14.5px] font-semibold truncate text-gray-800 leading-snug" style={{ fontFamily: "'Be Vietnam Pro', sans-serif", letterSpacing: '-0.01em' }}>{name}</h4>
+                <div className="mt-1.5 flex items-center justify-between gap-1">
                     <div className="flex items-baseline gap-2 truncate">
                         {price && 0 < price && price < originalPrice ? (
                             <>
-                                <span className="text-md text-[#C83B1E] font-bold">{(price * 25400).toLocaleString('vi-VN')}đ</span>
-                                <span className="text-[13px] text-gray-400 line-through">{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
+                                <span className="text-sm text-[#C83B1E] font-bold" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>{(price * 25400).toLocaleString('vi-VN')}đ</span>
+                                <span className="text-[12px] text-gray-400 line-through font-medium">{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
                             </>
                         ) : (
-                            <span className="text-md text-[#C83B1E] font-bold">{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
+                            <span className="text-sm text-[#C83B1E] font-bold" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>{(originalPrice * 25400).toLocaleString('vi-VN')}đ</span>
                         )}
                     </div>
                     {(!soldPercentage || soldPercentage <= 0) && totalSold !== undefined && (
-                        <span className="text-[12px] text-gray-500 whitespace-nowrap">Đã bán {totalSold}</span>
+                        <span className="text-[11px] text-gray-400 whitespace-nowrap font-medium">Đã bán {totalSold}</span>
                     )}
                 </div>
                 {(soldPercentage ?? 0) > 0 && <div className="mt-3 bg-gray-100 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-[#C83B1E] h-full transition-all duration-500" style={{ width: `${soldPercentage}%` }} />
                 </div>}
-                {(soldPercentage ?? 0) > 0 && <p className="text-[10px] text-gray-500 mt-1 font-medium uppercase h-2">Đã bán {soldPercentage}%</p>}
+                {(soldPercentage ?? 0) > 0 && <p className="text-[10px] text-gray-400 mt-1 font-semibold uppercase tracking-wide h-2">Đã bán {soldPercentage}%</p>}
                 {showBuyButton && (
-                    <Button className="w-full mt-3 bg-[#C83B1E] hover:bg-[#C83B1E]/90 hover:cursor-pointer text-white h-8 text-xs font-semibold">
+                    <Button className="w-full mt-3 bg-[#C83B1E] hover:bg-[#C83B1E]/90 hover:cursor-pointer text-white h-8 text-xs font-semibold" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>
                         {buttonText}
                     </Button>
                 )}

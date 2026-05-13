@@ -97,5 +97,15 @@ body {
   color: var(--color-foreground);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: Inter, Arial, sans-serif;
+  /* Be Vietnam Pro: tối ưu cho tiếng Việt, UI hiện đại */
+  font-family: 'Be Vietnam Pro', 'Inter', system-ui, sans-serif;
+  font-feature-settings: 'kern' 1, 'liga' 1;
+  letter-spacing: -0.01em;
 }
+
+/* Outfit dùng cho heading, tiêu đề lớn */
+h1, h2, h3, h4 {
+  font-family: 'Outfit', 'Be Vietnam Pro', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+

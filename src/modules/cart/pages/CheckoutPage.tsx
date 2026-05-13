@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '@/shared/context/CartContext';
 import { orderApi } from '@/shared/api/order.api';
 import { authApi } from '@/modules/auth/api/auth.api';
-import { voucherApi } from '@/shared/api/voucher.api';
+import { voucherApi, type Voucher } from '@/shared/api/voucher.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
 import { toast } from 'sonner';
 import { Button } from '@/shared/components/ui/button';
@@ -50,6 +50,10 @@ export const CheckoutPage = () => {
   const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
   const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
   const [discount, setDiscount] = useState(0);
+  
+  // New Voucher Picker states
+  const [userVouchers, setUserVouchers] = useState<Voucher[]>([]);
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
   const shipping = 0;
   const taxRate = 0.08;
@@ -116,6 +120,16 @@ export const CheckoutPage = () => {
           }
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
+        }
+
+        // Fetch User Vouchers
+        try {
+          const vRes = await voucherApi.getMyVouchers();
+          if (vRes.data.success) {
+            setUserVouchers(vRes.data.data);
+          }
+        } catch (err) {
+            console.error('Failed to fetch user vouchers:', err);
         }
       }
     };
@@ -679,39 +693,42 @@ export const CheckoutPage = () => {
                 )}
               </div>
 
-              {/* Voucher Input */}
+              {/* Voucher Selector */}
               <div className="mt-6 mb-4">
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Ticket size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    <Input 
-                      placeholder="Mã giảm giá" 
-                      value={voucherCode}
-                      onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
-                      className="pl-10 h-10 bg-gray-50/50 border-gray-200 uppercase"
-                      disabled={!!appliedVoucher}
-                    />
-                  </div>
-                  {appliedVoucher ? (
-                    <Button 
-                      type="button"
-                      variant="outline" 
+                {appliedVoucher ? (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-200 p-3 rounded-xl">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-green-500 text-white p-1.5 rounded-full">
+                            <Ticket size={16} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-bold text-green-800 uppercase">{appliedVoucher.code}</p>
+                            <p className="text-xs text-green-600">Đã áp dụng giảm giá</p>
+                        </div>
+                    </div>
+                    <button 
+                      type="button" 
                       onClick={handleRemoveVoucher}
-                      className="h-10 border-gray-200 text-gray-500 hover:text-red-500 cursor-pointer"
+                      className="text-xs font-bold text-red-500 hover:text-red-700 uppercase"
                     >
-                      Gỡ bỏ
-                    </Button>
-                  ) : (
-                    <Button 
-                      type="button"
-                      onClick={handleApplyVoucher}
-                      disabled={isValidatingVoucher || !voucherCode.trim()}
-                      className="h-10 bg-gray-800 hover:bg-gray-900 text-white px-5 cursor-pointer disabled:opacity-50"
-                    >
-                      {isValidatingVoucher ? <Loader2 size={16} className="animate-spin" /> : 'Áp dụng'}
-                    </Button>
-                  )}
-                </div>
+                        Gỡ bỏ
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsVoucherModalOpen(true)}
+                    className="w-full flex items-center justify-between p-4 bg-gray-50/50 hover:bg-gray-100 border border-gray-200 rounded-xl transition-colors group cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 text-gray-600 group-hover:text-gray-900">
+                        <Ticket size={20} className="text-[#FF6B00]" />
+                        <span className="font-semibold text-sm">Chọn Kho Voucher</span>
+                    </div>
+                    <span className="text-xs font-bold bg-[#FF6B00] text-white px-2 py-1 rounded-full">
+                        {userVouchers.length} mã có sẵn
+                    </span>
+                  </button>
+                )}
               </div>
 
               <div className="border-t border-gray-200 mt-4 pt-4">
@@ -746,6 +763,73 @@ export const CheckoutPage = () => {
           </div>
         </div>
       </form>
+
+      {/* Voucher Modal Overlay */}
+      {isVoucherModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2 text-lg">
+                        <Ticket className="text-[#FF6B00]" /> Kho Voucher của bạn
+                    </h3>
+                    <button type="button" onClick={() => setIsVoucherModalOpen(false)} className="text-gray-400 hover:text-gray-600 p-1">
+                        ✕
+                    </button>
+                </div>
+                
+                <div className="overflow-y-auto p-4 space-y-3 bg-gray-50/50 flex-1">
+                    {userVouchers.length === 0 ? (
+                        <div className="text-center py-10 text-gray-500">
+                            <Ticket className="size-12 mx-auto mb-3 opacity-20" />
+                            <p className="text-sm">Bạn chưa lưu voucher nào.</p>
+                            <Link to="/vouchers" className="text-[#FF6B00] text-xs font-bold hover:underline block mt-2" onClick={() => setIsVoucherModalOpen(false)}>
+                                Đi Săn Voucher Ngay
+                            </Link>
+                        </div>
+                    ) : (
+                        userVouchers.map(voucher => {
+                            const isEligible = totalBeforeVoucher >= voucher.minOrderAmount;
+                            return (
+                                <div key={voucher._id} className={`bg-white rounded-xl border flex overflow-hidden ${isEligible ? 'border-[#FF6B00]/30 shadow-sm' : 'border-gray-200 opacity-60 grayscale'}`}>
+                                    <div className={`w-24 flex flex-col items-center justify-center text-white text-center p-2 border-r-2 border-dashed ${isEligible ? 'bg-[#FF6B00] border-orange-200' : 'bg-gray-400 border-gray-300'}`}>
+                                        <span className="text-xl font-bold font-mono">
+                                            {voucher.type === 'percentage' ? `${voucher.value}%` : `${(voucher.value * 25400 / 1000).toLocaleString()}k`}
+                                        </span>
+                                    </div>
+                                    <div className="flex-1 p-3 flex flex-col justify-between">
+                                        <div>
+                                            <p className="font-bold text-sm text-gray-900 mb-1 leading-tight">Đơn tối thiểu {(voucher.minOrderAmount * 25400).toLocaleString('vi-VN')}đ</p>
+                                            <p className="text-[10px] text-gray-500">HSD: {new Date(voucher.expiryDate).toLocaleDateString('vi-VN')}</p>
+                                        </div>
+                                        <div className="mt-2 text-right">
+                                            <Button 
+                                                type="button"
+                                                disabled={!isEligible}
+                                                onClick={() => {
+                                                    setVoucherCode(voucher.code);
+                                                    setIsVoucherModalOpen(false);
+                                                    // Trigger validate automatically after state updates
+                                                    setTimeout(() => {
+                                                        const btn = document.getElementById('hidden-apply-btn');
+                                                        if (btn) btn.click();
+                                                    }, 50);
+                                                }}
+                                                className={`h-7 px-3 text-[10px] font-bold rounded-full ${isEligible ? 'bg-[#FF6B00] hover:bg-[#E65A00] text-white' : 'bg-gray-200 text-gray-500'}`}
+                                            >
+                                                {isEligible ? 'Dùng ngay' : 'Chưa đủ ĐK'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+            </div>
+            {/* Hidden button to trigger validation after modal closes */}
+            <button id="hidden-apply-btn" type="button" onClick={handleApplyVoucher} className="hidden"></button>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Plus, Trash2, Ticket, CheckCircle2, XCircle, Edit } from 'lucide-react'
 import { voucherApi, type Voucher } from '@/shared/api/voucher.api';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
+import { VoucherCodeInput } from '@/shared/components/ui/VoucherCodeInput';
 import { toast } from 'sonner';
 
 export default function AdminVouchersPage() {
@@ -169,12 +170,10 @@ export default function AdminVouchersPage() {
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Mã Voucher</label>
-                                <Input 
-                                    required 
-                                    placeholder="Ví dụ: CHAOXUAN2024" 
+                                <VoucherCodeInput
+                                    required
                                     value={form.code}
-                                    onChange={e => setForm({...form, code: e.target.value.toUpperCase()})}
-                                    className="uppercase font-mono"
+                                    onChange={(val) => setForm({ ...form, code: val })}
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">

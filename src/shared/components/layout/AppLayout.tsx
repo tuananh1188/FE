@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Home, User, LogOut, Search, ShoppingCart, Bell, LayoutDashboard } from 'lucide-react';
+import { Home, User, LogOut, ShoppingCart, Bell, LayoutDashboard } from 'lucide-react';
 import { ThemeToggle } from '@/shared/components/ui/theme-toggle';
 import { authApi } from '@/modules/auth/api/auth.api';
 import { tokenStore } from '@/modules/auth/store/token.store';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar';
 import { Button } from '@/shared/components/ui/button';
-import { Input } from '@/shared/components/ui/input';
 import { cn } from '@/shared/lib/utils';
 import type { CurrentUser } from '@/modules/auth/types/auth.types';
 import { useCart } from '@/shared/context/CartContext';
+import { CustomerSearchBar } from '@/shared/components/ui/CustomerSearchBar';
+import { BrandMegaMenu } from '@/shared/components/ui/BrandMegaMenu';
+import { ChatWidget } from '@/shared/components/chat/ChatWidget';
 
 export const AppLayout = () => {
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -55,18 +57,9 @@ export const AppLayout = () => {
           </Link>
 
           {/* Search Bar */}
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const search = formData.get('search');
-              if (search) navigate(`/categories?search=${search}`);
-            }}
-            className="hidden md:block flex-1 max-w-md relative"
-          >
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-            <Input name="search" className="pl-10 bg-muted/50 border-none rounded-full h-9" placeholder="Tìm kiếm bộ sưu tập..." />
-          </form>
+          <div className="flex-1 max-w-md flex items-center">
+            <CustomerSearchBar />
+          </div>
 
           {/* Home Link */}
           <Link
@@ -86,8 +79,8 @@ export const AppLayout = () => {
           <nav className="hidden lg:flex items-center gap-6 text-[13px] font-medium text-muted-foreground">
             <Link to="/categories/flash-sale" className="text-[#C83B1E]">Khuyến mãi</Link>
             <Link to="/categories" className={cn('hover:text-foreground', location.pathname.startsWith('/categories') && 'text-foreground font-semibold')}>Sản phẩm</Link>
-            <a href="#" className="hover:text-foreground">Thương hiệu</a>
-            <a href="#" className="hover:text-foreground">Mã giảm giá</a>
+            <BrandMegaMenu />
+            <Link to="/vouchers" className={cn('hover:text-foreground', location.pathname === '/vouchers' && 'text-foreground font-semibold')}>Mã giảm giá</Link>
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -143,6 +136,7 @@ export const AppLayout = () => {
       <main className="mx-auto max-w-7xl px-4 py-6 w-full flex-1">
         <Outlet />
       </main>
+      <ChatWidget />
     </div>
   );
 };

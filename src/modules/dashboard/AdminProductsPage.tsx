@@ -5,7 +5,8 @@ import {
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import type { ColumnsType } from 'antd/es/table';
-import { Plus, Search, Pencil, Trash2, PackageOpen, RefreshCw, UploadCloud } from 'lucide-react';
+import { Plus, Pencil, Trash2, PackageOpen, RefreshCw, UploadCloud } from 'lucide-react';
+import { ProductSearchInput } from '@/shared/components/ui/ProductSearchInput';
 import { productApi, type Product } from './api/product.api';
 import { categoryApi, type Category } from '../../shared/api/category.api';
 
@@ -310,14 +311,11 @@ const AdminProductsPage: React.FC = () => {
 
                 {/* Search */}
                 <div className="mb-5">
-                    <Input
+                    <ProductSearchInput
                         id="product-search"
-                        allowClear
-                        placeholder="Tìm kiếm theo tên hoặc mô tả…"
-                        prefix={<Search size={16} className="text-gray-400 mr-1" />}
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="max-w-sm rounded-xl"
+                        onChange={(val) => setSearchQuery(val)}
+                        placeholder="Tìm kiếm theo tên hoặc mô tả…"
                     />
                 </div>
 

@@ -28,4 +28,13 @@ export const voucherApi = {
 
     delete: (id: string) =>
         http.delete<{ success: boolean; message?: string }>(`vouchers/delete/${id}`),
+
+    getActive: () =>
+        http.get<{ success: boolean; data: Voucher[] }>('vouchers/active'),
+
+    saveVoucher: (code: string) =>
+        http.post<{ success: boolean; message: string }>(`vouchers/save/${code}`),
+
+    getMyVouchers: () =>
+        http.get<{ success: boolean; data: Voucher[] }>('vouchers/my-vouchers'),
 };
