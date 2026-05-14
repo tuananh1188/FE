@@ -48,7 +48,6 @@ export const CheckoutPage = () => {
   // Voucher states
   const [voucherCode, setVoucherCode] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState<any>(null);
-  const [isValidatingVoucher, setIsValidatingVoucher] = useState(false);
   const [discount, setDiscount] = useState(0);
   
   // New Voucher Picker states
@@ -65,7 +64,6 @@ export const CheckoutPage = () => {
     if (!voucherCode.trim()) return;
     
     try {
-      setIsValidatingVoucher(true);
       const res = await voucherApi.validate(voucherCode, totalBeforeVoucher);
       if (res.data.success) {
         setAppliedVoucher(res.data.voucher);
@@ -76,8 +74,6 @@ export const CheckoutPage = () => {
       toast.error(error?.response?.data?.message || 'Mã giảm giá không hợp lệ');
       setAppliedVoucher(null);
       setDiscount(0);
-    } finally {
-      setIsValidatingVoucher(false);
     }
   };
 

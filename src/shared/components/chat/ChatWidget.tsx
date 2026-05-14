@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User, ShoppingCart, ExternalLink } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { MessageCircle, X, Send, Bot, User, ShoppingCart } from 'lucide-react';
 import { chatApi, type ChatHistoryEntry } from '../../api/chat.api';
 import { ProductDetailModal } from '../../../modules/products/components/ProductDetailModal';
 
 export const ChatWidget = () => {
-    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [messages, setMessages] = useState<{role: 'user' | 'model', text: string, products?: any[]}[]>([
