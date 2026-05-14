@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User, ShoppingCart, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { chatApi, type ChatHistoryEntry } from '../../api/chat.api';
+import { ProductDetailModal } from '../../../modules/products/components/ProductDetailModal';
 
 export const ChatWidget = () => {
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [messages, setMessages] = useState<{role: 'user' | 'model', text: string, products?: any[]}[]>([
         { role: 'model', text: 'Xin chào! Mình là trợ lý ảo của SPCK-X41. Mình có thể giúp gì cho bạn hôm nay?' }
     ]);
@@ -99,7 +101,7 @@ export const ChatWidget = () => {
                                             {msg.products.map((product) => (
                                                 <div 
                                                     key={product._id}
-                                                    onClick={() => navigate(`/product/${product.slug || product._id}`)}
+                                                    onClick={() => setSelectedProductId(product._id)}
                                                     className="w-40 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-all flex flex-col group"
                                                 >
                                                     <div className="relative aspect-square overflow-hidden bg-gray-50">
@@ -193,6 +195,11 @@ export const ChatWidget = () => {
                     </span>
                 )}
             </button>
+
+            <ProductDetailModal
+                productId={selectedProductId}
+                onClose={() => setSelectedProductId(null)}
+            />
         </div>
     );
 };
