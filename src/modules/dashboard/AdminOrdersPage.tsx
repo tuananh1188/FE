@@ -38,9 +38,10 @@ export const AdminOrdersPage = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING': return 'bg-yellow-100 text-yellow-700';
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case 'PENDING': return 'bg-yellow-100 text-yellow-700';
+        case 'VERIFYING': return 'bg-blue-100 text-blue-700';
       case 'PROCESSING': return 'bg-blue-100 text-blue-700';
       case 'SHIPPED': return 'bg-indigo-100 text-indigo-700';
       case 'DELIVERED': return 'bg-green-100 text-green-700';
@@ -114,6 +115,7 @@ export const AdminOrdersPage = () => {
                         className={`text-xs font-bold rounded-full px-2 py-0.5 border-none cursor-pointer outline-none ${getStatusColor(order.paymentStatus)}`}
                       >
                         <option value="PENDING">CHỜ THANH TOÁN</option>
+                        <option value="VERIFYING">ĐANG XÁC MINH</option>
                         <option value="PAID">ĐÃ THANH TOÁN</option>
                         <option value="FAILED">THẤT BẠI</option>
                       </select>

@@ -21,7 +21,7 @@ export type OrderAPIResponse = {
         notes?: string;
     };
     paymentMethod: 'COD' | 'CREDIT_CARD' | 'BANK_TRANSFER';
-    paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
+    paymentStatus: 'PENDING' | 'VERIFYING' | 'PAID' | 'FAILED';
     orderStatus: 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
     subtotal: number;
     shippingFee: number;

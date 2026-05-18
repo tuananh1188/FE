@@ -309,6 +309,15 @@ export const CheckoutPage = () => {
                     </>
                   )}
                 </Button>
+              ) : orderSuccess.paymentStatus === 'VERIFYING' ? (
+                <div className="flex flex-col items-center justify-center gap-2 text-blue-600 font-bold py-4 bg-blue-50 rounded-xl border border-blue-200 text-center px-4">
+                  <div className="flex items-center gap-2">
+                    <Loader2 size={20} className="animate-spin" /> Hệ thống đang xác minh
+                  </div>
+                  <span className="text-xs font-normal text-blue-500 mt-1">
+                    Kế toán đang kiểm tra giao dịch của bạn. Quá trình này có thể mất vài phút.
+                  </span>
+                </div>
               ) : (
                 <div className="flex items-center justify-center gap-2 text-green-600 font-bold py-3 bg-green-50 rounded-xl border border-green-200">
                   <ShieldCheck size={20} /> Đã xác nhận thanh toán
@@ -514,108 +523,7 @@ export const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Payment Method */}
-            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <CreditCard size={20} className="text-[#FF6B00]" />
-                Phương thức thanh toán
-              </h2>
 
-              <div className="space-y-3">
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    paymentMethod === 'COD'
-                      ? 'border-[#FF6B00] bg-orange-50/50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="COD"
-                    checked={paymentMethod === 'COD'}
-                    onChange={() => setPaymentMethod('COD')}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'COD' ? 'border-[#FF6B00]' : 'border-gray-300'
-                    }`}
-                  >
-                    {paymentMethod === 'COD' && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
-                    )}
-                  </div>
-                  <Banknote size={24} className="text-green-600" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">Thanh toán khi nhận hàng (COD)</p>
-                    <p className="text-xs text-gray-500">Thanh toán bằng tiền mặt khi giao hàng</p>
-                  </div>
-                </label>
-
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    paymentMethod === 'CREDIT_CARD'
-                      ? 'border-[#FF6B00] bg-orange-50/50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="CREDIT_CARD"
-                    checked={paymentMethod === 'CREDIT_CARD'}
-                    onChange={() => setPaymentMethod('CREDIT_CARD')}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'CREDIT_CARD' ? 'border-[#FF6B00]' : 'border-gray-300'
-                    }`}
-                  >
-                    {paymentMethod === 'CREDIT_CARD' && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
-                    )}
-                  </div>
-                  <CreditCard size={24} className="text-blue-600" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">Thẻ tín dụng / Ghi nợ</p>
-                    <p className="text-xs text-gray-500">Visa, Mastercard, JCB</p>
-                  </div>
-                </label>
-
-                <label
-                  className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    paymentMethod === 'BANK_TRANSFER'
-                      ? 'border-[#FF6B00] bg-orange-50/50'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="BANK_TRANSFER"
-                    checked={paymentMethod === 'BANK_TRANSFER'}
-                    onChange={() => setPaymentMethod('BANK_TRANSFER')}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'BANK_TRANSFER' ? 'border-[#FF6B00]' : 'border-gray-300'
-                    }`}
-                  >
-                    {paymentMethod === 'BANK_TRANSFER' && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#FF6B00]" />
-                    )}
-                  </div>
-                  <Ticket size={24} className="text-orange-600" />
-                  <div>
-                    <p className="font-bold text-gray-800 text-sm">Chuyển khoản Ngân hàng (VietQR)</p>
-                    <p className="text-xs text-gray-500">Tạo mã QR thanh toán tự động</p>
-                  </div>
-                </label>
-              </div>
-            </div>
           </div>
 
           {/* Right - Order Review */}
@@ -727,7 +635,43 @@ export const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="border-t border-gray-200 mt-4 pt-4">
+              {/* Payment Method (Moved to Right Column) */}
+              <div className="mt-6 mb-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <CreditCard size={18} className="text-[#FF6B00]" />
+                  Phương thức thanh toán
+                </h3>
+                <div className="space-y-2">
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-[#FF6B00] bg-orange-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'}`}>
+                    <input type="radio" name="paymentMethod" value="COD" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} className="sr-only" />
+                    <Banknote size={20} className={paymentMethod === 'COD' ? 'text-[#FF6B00]' : 'text-gray-400'} />
+                    <span className="font-semibold text-sm text-gray-800 flex-1">Nhận hàng (COD)</span>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'COD' ? 'border-[#FF6B00]' : 'border-gray-300'}`}>
+                      {paymentMethod === 'COD' && <div className="w-2 h-2 rounded-full bg-[#FF6B00]" />}
+                    </div>
+                  </label>
+
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'CREDIT_CARD' ? 'border-[#FF6B00] bg-orange-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'}`}>
+                    <input type="radio" name="paymentMethod" value="CREDIT_CARD" checked={paymentMethod === 'CREDIT_CARD'} onChange={() => setPaymentMethod('CREDIT_CARD')} className="sr-only" />
+                    <CreditCard size={20} className={paymentMethod === 'CREDIT_CARD' ? 'text-[#FF6B00]' : 'text-gray-400'} />
+                    <span className="font-semibold text-sm text-gray-800 flex-1">Thẻ tín dụng / Ghi nợ</span>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'CREDIT_CARD' ? 'border-[#FF6B00]' : 'border-gray-300'}`}>
+                      {paymentMethod === 'CREDIT_CARD' && <div className="w-2 h-2 rounded-full bg-[#FF6B00]" />}
+                    </div>
+                  </label>
+
+                  <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${paymentMethod === 'BANK_TRANSFER' ? 'border-[#FF6B00] bg-orange-50/50 shadow-sm' : 'border-gray-200 hover:border-gray-300 bg-gray-50/50'}`}>
+                    <input type="radio" name="paymentMethod" value="BANK_TRANSFER" checked={paymentMethod === 'BANK_TRANSFER'} onChange={() => setPaymentMethod('BANK_TRANSFER')} className="sr-only" />
+                    <Ticket size={20} className={paymentMethod === 'BANK_TRANSFER' ? 'text-[#FF6B00]' : 'text-gray-400'} />
+                    <span className="font-semibold text-sm text-gray-800 flex-1">Chuyển khoản (VietQR)</span>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'BANK_TRANSFER' ? 'border-[#FF6B00]' : 'border-gray-300'}`}>
+                      {paymentMethod === 'BANK_TRANSFER' && <div className="w-2 h-2 rounded-full bg-[#FF6B00]" />}
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 mt-6 pt-6">
                 <div className="flex justify-between items-end mb-6">
                   <span className="text-lg font-bold text-gray-900">Tổng thanh toán</span>
                   <span className="text-2xl font-black text-[#FF6B00] leading-none">
