@@ -23,13 +23,13 @@ export const SortHeader = ({ totalItems, categoryName, currentSort, onSortChange
     return (
         <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-10 gap-4">
             <div>
-                <h1 className="text-gray-900 text-4xl md:text-5xl font-black tracking-tight mb-2" style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em' }}>
+                <h1 className="text-gray-900 text-2xl md:text-3xl font-bold uppercase mb-2">
                     {categoryName}
                 </h1>
                 {itemRange ? (
-                    <p className="text-gray-400 text-sm" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hiển thị <span className="font-bold text-gray-700">{itemRange}</span> trong số <span className="font-bold text-gray-700">{totalItems.toLocaleString()}</span> sản phẩm</p>
+                    <p className="text-gray-500 text-sm">Hiển thị <span className="font-bold text-gray-700">{itemRange}</span> trong số <span className="font-bold text-gray-700">{totalItems.toLocaleString()}</span> sản phẩm</p>
                 ) : (
-                    <p className="text-gray-400 text-sm" style={{ fontFamily: "'Be Vietnam Pro', sans-serif" }}>Hiển thị <span className="font-bold text-gray-700">{totalItems.toLocaleString()}</span> sản phẩm</p>
+                    <p className="text-gray-500 text-sm">Hiển thị <span className="font-bold text-gray-700">{totalItems.toLocaleString()}</span> sản phẩm</p>
                 )}
             </div>
             <div className="flex items-center gap-4">

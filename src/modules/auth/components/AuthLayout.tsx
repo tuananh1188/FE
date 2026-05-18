@@ -34,11 +34,10 @@ export const AuthLayout = () => {
 
             <div className="relative z-10 space-y-4">
               <h1 className="text-3xl md:text-5xl font-medium leading-tight">
-                Curating the world's finest for your everyday.
+                Tuyển chọn những gì tinh túy nhất cho cuộc sống của bạn.
               </h1>
               <p className="text-base md:text-lg opacity-80 font-light max-w-sm">
-                Join a community of connoisseurs and discover objects that tell
-                a story.
+                Tham gia cộng đồng những người am hiểu và khám phá những món đồ mang câu chuyện riêng.
               </p>
             </div>
           </section>
@@ -56,7 +55,7 @@ export const AuthLayout = () => {
                     : "text-gray-400 hover:text-orange-600",
                 )}
               >
-                Create Account
+                Đăng ký
               </Link>
               <Link
                 to="/login"
@@ -67,7 +66,7 @@ export const AuthLayout = () => {
                     : "text-gray-400 hover:text-orange-600",
                 )}
               >
-                Sign In
+                Đăng nhập
               </Link>
             </nav>
 
@@ -82,20 +81,20 @@ export const AuthLayout = () => {
       <footer className="w-full max-w-6xl mx-auto px-8 py-10 flex flex-col md:flex-row justify-between items-center border-t border-gray-200 text-[13px] text-gray-500">
         <div className="space-y-1 text-center md:text-left mb-4 md:mb-0">
           <p className="font-semibold text-black">The Editorial Marketplace</p>
-          <p>© 2024 The Editorial Marketplace. All rights reserved.</p>
+          <p>© 2024 Sàn Thương Mại Editorial. Đã đăng ký bản quyền.</p>
         </div>
         <div className="flex gap-6">
           <Link to="#" className="hover:text-black transition">
-            Privacy Policy
+            Chính sách bảo mật
           </Link>
           <Link to="#" className="hover:text-black transition">
-            Terms of Service
+            Điều khoản dịch vụ
           </Link>
           <Link to="#" className="hover:text-black transition">
-            Help Center
+            Trung tâm trợ giúp
           </Link>
           <Link to="#" className="hover:text-black transition">
-            Contact Us
+            Liên hệ
           </Link>
         </div>
       </footer>
